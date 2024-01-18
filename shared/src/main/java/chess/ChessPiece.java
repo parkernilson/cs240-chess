@@ -30,6 +30,36 @@ public class ChessPiece {
         PAWN
     }
 
+    private static Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
+
+        throw new RuntimeException("Not implemented");
+    }
+
+    private static Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+
+        throw new RuntimeException("Not implemented");
+    }
+
+    private static Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
+
+        throw new RuntimeException("Not implemented");
+    }
+
+    private static Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+
+        throw new RuntimeException("Not implemented");
+    }
+
+    private static Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
+
+        throw new RuntimeException("Not implemented");
+    }
+
+    private static Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+
+        throw new RuntimeException("Not implemented");
+    }
+
     /**
      * @return Which team this chess piece belongs to
      */
@@ -52,6 +82,23 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        // based on which type this piece is, call the appropriate helper method
+        // return the result of the helper method
+        switch (type) {
+            case PAWN:
+                return pawnMoves(board, myPosition);
+            case ROOK:
+                return rookMoves(board, myPosition);
+            case KNIGHT:
+                return knightMoves(board, myPosition);
+            case BISHOP:
+                return bishopMoves(board, myPosition);
+            case QUEEN:
+                return queenMoves(board, myPosition);
+            case KING:
+                return kingMoves(board, myPosition);
+            default:
+                throw new RuntimeException(String.format("Unsupported piece type: %s", type));
+        }
     }
 }
