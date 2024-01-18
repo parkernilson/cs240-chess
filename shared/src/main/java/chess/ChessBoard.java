@@ -43,6 +43,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
+        // TODO: set up the board with the default positions
         board = new HashMap<ChessPosition, ChessPiece>();
     }
 }
