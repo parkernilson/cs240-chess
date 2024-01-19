@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * Represents a single chess piece
@@ -13,24 +12,10 @@ public class ChessPiece {
 
     private ChessGame.TeamColor pieceColor;
     private ChessPiece.PieceType type;
-    private final int FORWARD;
-    private final int BACKWARD;
-    private final int RIGHT;
-    private final int LEFT;
-
-    static int BLACK_PAWN_HOME_ROW = 7;
-    static int WHITE_PAWN_HOME_ROW = 2;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
-        // if black, then forward is -1, if white, then forward is +1 (and backward is
-        // opposite)
-        FORWARD = pieceColor == ChessGame.TeamColor.BLACK ? -1 : 1;
-        BACKWARD = -FORWARD;
-        // if black, then right is +1, if white, then right is -1 (and left is opposite)
-        RIGHT = pieceColor == ChessGame.TeamColor.BLACK ? -1 : 1;
-        LEFT = -RIGHT;
     }
 
     /**
