@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -9,6 +10,9 @@ import java.util.HashMap;
  * signature of the existing methods.
  */
 public class ChessBoard {
+
+    static int WIDTH = 8;
+    static int HEIGHT = 8;
 
     /** Represents the pieces of this chess board. */
     HashMap<ChessPosition, ChessPiece> board;
@@ -25,6 +29,26 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board.put(position, piece);
+    }
+
+    static boolean inBounds(ChessPosition position) {
+        return position.getRow() >= 1 
+            && position.getRow() <= HEIGHT 
+            && position.getColumn() >= 1
+            && position.getColumn() <= WIDTH;
+    }
+
+    public Optional<ChessPiece> checkPiece(ChessPosition position) throws PositionOutOfBoundsException {
+        if (inBounds(position)) {
+            return Optional.ofNullable(getPiece(position));
+        } else {
+            throw new PositionOutOfBoundsException();
+        }
+    }
+
+    public Optional<ChessPiece> checkPiece(int row, int col) throws PositionOutOfBoundsException {
+        final ChessPosition position = new ChessPosition(row, col);
+        return checkPiece(position);
     }
 
     /**
