@@ -87,7 +87,8 @@ public class ChessPiece {
                 QueenMovesCalculator queenCalc = new QueenMovesCalculator(pieceColor);
                 return queenCalc.pieceMoves(board, myPosition);
             case KING:
-                throw new RuntimeException("Not implemented");
+                KingMovesCalculator kingCalc = new KingMovesCalculator(pieceColor);
+                return kingCalc.pieceMoves(board, myPosition);
             default:
                 throw new RuntimeException(String.format("Unsupported piece type: %s", type));
         }
