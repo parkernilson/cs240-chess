@@ -84,7 +84,8 @@ public class ChessPiece {
                 BishopMovesCalculator bishopCalc = new BishopMovesCalculator(pieceColor);
                 return bishopCalc.pieceMoves(board, myPosition);
             case QUEEN:
-                throw new RuntimeException("Not implemented");
+                QueenMovesCalculator queenCalc = new QueenMovesCalculator(pieceColor);
+                return queenCalc.pieceMoves(board, myPosition);
             case KING:
                 throw new RuntimeException("Not implemented");
             default:
