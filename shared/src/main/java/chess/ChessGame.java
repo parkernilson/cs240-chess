@@ -154,7 +154,38 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor)) return false;
+
+        final var kingPosition = getKingPosition(teamColor);
+
+        // check if any pieces can move to block the king (or capture the offending piece)
+        for (int row = 1; row <= ChessBoard.HEIGHT; ++row) {
+            for (int col = 1; col <= ChessBoard.WIDTH; ++col) {
+                // check if any of the possible moves this piece can make will stop the checkmate
+                final var curPosition = new ChessPosition(row, col);
+                final var curPiece = board.getPiece(curPosition);
+
+                if (curPiece.getTeamColor() != teamColor) continue;
+
+                final var curValidMoves = validMoves(curPosition);
+
+                for (ChessMove move : curValidMoves) {
+                    if (!moveCausesCheck(move)) return false;
+                }
+            }
+        }
+
+        // check if the king can move to avoid check
+        final var kingValidMoves = validMoves(kingPosition);
+
+        // for each move, test the move and check if the king is still in check
+        for (var move : kingValidMoves) {
+            // if there is a move that removes the king from check, then it is not checkmate
+            if (!moveCausesCheck(move)) return false;
+        }
+
+        // if there is no case where the king can avoid check, then it is checkmate
+        return true;
     }
 
     /**
