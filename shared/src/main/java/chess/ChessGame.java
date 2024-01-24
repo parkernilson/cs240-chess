@@ -108,7 +108,19 @@ public class ChessGame {
     }
 
     private ChessPosition getKingPosition(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition positionOfKing = null;
+        for (int row = 0; row <= ChessBoard.HEIGHT; ++row) {
+            for (int col = 0; col <= ChessBoard.WIDTH; ++col) {
+                final var curPosition = new ChessPosition(row, col);
+                final var curPiece = board.getPiece(curPosition);
+                if (curPiece.getTeamColor() == teamColor && curPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    positionOfKing = curPosition;
+                    break;
+                } 
+            }
+        }
+
+        return positionOfKing;
     }
 
     /**
