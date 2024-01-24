@@ -49,7 +49,24 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        final var piece = board.getPiece(startPosition);
+
+        // if there is no piece at the given position, no valid moves
+        if (piece == null) return null;
+
+        // if it is not the piece's turn, it has no valid moves
+        if (piece.getTeamColor() != turnTeam) return null;
+
+        final var possibleMoves = piece.pieceMoves(board, startPosition);
+
+        // for each move, if it leaves the king in check, remove it from the list
+        for (final var possibleMove : possibleMoves) {
+            if (!moveCausesCheck(possibleMove)) {
+                possibleMoves.remove(possibleMove);
+            }
+        }
+
+        return possibleMoves;
     }
 
     /**
