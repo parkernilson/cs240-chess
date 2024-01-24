@@ -165,7 +165,23 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // check every position that is the team color if any piece can make a valid move then return false
+        for (int row = 1; row <= ChessBoard.HEIGHT; ++row) {
+            for (int col = 1; col <= ChessBoard.WIDTH; ++col) {
+                final var curPosition = new ChessPosition(row, col);
+                final var curPiece = board.getPiece(curPosition);
+
+                // only consider pieces of the specified color
+                if (curPiece.getTeamColor() != teamColor) continue;
+
+                final var validMovesAtRowCol = validMoves(curPosition);
+                if (validMovesAtRowCol != null) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
