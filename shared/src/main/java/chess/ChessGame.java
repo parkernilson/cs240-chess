@@ -10,15 +10,18 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessGame() {
+    private TeamColor turnTeam = TeamColor.WHITE;
+    private ChessBoard board;
 
+    public ChessGame() {
+        board = new ChessBoard();
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return turnTeam;
     }
 
     /**
@@ -27,7 +30,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        turnTeam = team;
     }
 
     /**
@@ -50,12 +53,44 @@ public class ChessGame {
     }
 
     /**
+     * Test a move to see if it causes check (without modifying the board state)
+     * @param move - The move to check
+     * @return True if the move would cause check if executed. False otherwise
+     */
+    public boolean moveCausesCheck(ChessMove move) {
+        final var startPiece = board.getPiece(move.getStartPosition());
+        final var endPiece = board.getPiece(move.getEndPosition());
+        // make the move
+        board.addPiece(move.getStartPosition(), null);
+        board.addPiece(move.getEndPosition(), startPiece);
+
+        if (isInCheck(turnTeam)) {
+            return true;
+        }
+
+        // reverse the move
+        board.addPiece(move.getStartPosition(), startPiece);
+        board.addPiece(move.getEndPosition(), endPiece);
+
+        return false;
+    }
+
+    /**
      * Makes a move in a chess game
      *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+
+        // if the move is in the set of valid moves at the given position, make the move
+
+        // once the move is made, set the turn to the other team (?)
+
+        throw new RuntimeException("Not implemented");
+    }
+
+    private ChessPosition getKingPosition(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
     }
 
@@ -66,7 +101,21 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // find the king of the given team (maybe keep a reference?)
+        final var kingPosition = getKingPosition(teamColor);
+
+        // check all possible angles of attack for the other team's pieces
+        // Bishop: go in diagonal directions
+        // Rook: go in horizontal and vertical directions
+        // Queen: (in diagonal and straight directions)
+        // King: (in all directions, one space)
+        // Pawn: at the front left and front right positions
+        // Knight: in the L positions (don't care about blocking pieces)
+
+        // if a piece is found that can attack the king, return true
+
+        // otherwise, return false
+        return false;
     }
 
     /**
@@ -96,7 +145,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -105,6 +154,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.board;
     }
 }
