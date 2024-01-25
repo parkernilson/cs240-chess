@@ -38,6 +38,15 @@ public class ChessBoard {
             && position.getColumn() <= WIDTH;
     }
 
+    public ChessPosition getNewPosition(int row, int col) throws PositionOutOfBoundsException {
+        final ChessPosition position = new ChessPosition(row, col);
+        if (inBounds(position)) {
+            return position;
+        } else {
+            throw new PositionOutOfBoundsException();
+        }
+    }
+
     public Optional<ChessPiece> checkPiece(ChessPosition position) throws PositionOutOfBoundsException {
         if (inBounds(position)) {
             return Optional.ofNullable(getPiece(position));
