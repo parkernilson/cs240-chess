@@ -60,6 +60,22 @@ public class ChessBoard {
         return checkPiece(position);
     }
 
+    public static int getForward(ChessGame.TeamColor pieceColor) {
+        return pieceColor == ChessGame.TeamColor.WHITE ? 1 : -1;
+    }
+
+    public static int getBackward(ChessGame.TeamColor pieceColor) {
+        return -getForward(pieceColor);
+    }
+
+    public static int getRight(ChessGame.TeamColor pieceColor) {
+        return pieceColor == ChessGame.TeamColor.WHITE ? 1 : -1;
+    }
+
+    public static int getLeft(ChessGame.TeamColor pieceColor) {
+        return -getRight(pieceColor);
+    }
+
     /**
      * Gets a chess piece on the chessboard
      *
