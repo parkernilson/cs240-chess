@@ -45,6 +45,28 @@ public class ChessPiece {
     }
 
     /**
+     * @return the symbol representing this piece on a board
+     */
+    public String getSymbol() {
+        switch (type) {
+            case PAWN:
+                return pieceColor == ChessGame.TeamColor.WHITE ? "P" : "p";
+            case ROOK:
+                return pieceColor == ChessGame.TeamColor.WHITE ? "R" : "r";
+            case KNIGHT:
+                return pieceColor == ChessGame.TeamColor.WHITE ? "N" : "n";
+            case BISHOP:
+                return pieceColor == ChessGame.TeamColor.WHITE ? "B" : "b";
+            case QUEEN:
+                return pieceColor == ChessGame.TeamColor.WHITE ? "Q" : "q";
+            case KING:
+                return pieceColor == ChessGame.TeamColor.WHITE ? "K" : "k";
+            default:
+                throw new RuntimeException(String.format("Unsupported piece type: %s", type));
+        }
+    }
+
+    /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
      * danger

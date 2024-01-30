@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -57,26 +58,25 @@ public class ChessGame {
         if (piece == null)
             return null;
 
-        // if it is not the piece's turn, it has no valid moves
-        if (piece.getTeamColor() != turnTeam)
-            return null;
+        final var pieceColor = piece.getTeamColor();
 
         final var possibleMoves = piece.pieceMoves(board, startPosition);
+        var validMoves = new HashSet<ChessMove>();
 
         // for each move, if it leaves the king in check, remove it from the list
         for (final var possibleMove : possibleMoves) {
-            if (moveCausesCheck(possibleMove, turnTeam)) {
-                possibleMoves.remove(possibleMove);
+            if (!moveCausesCheck(possibleMove, pieceColor)) {
+                validMoves.add(possibleMove);
             }
         }
 
-        return possibleMoves;
+        return validMoves;
     }
 
     /**
      * Test a move to see if it causes check (without modifying the board state)
      * 
-     * @param move - The move to check
+     * @param move      - The move to check
      * @param teamColor - checks if the move causes check against this team color
      * @return True if the move would cause check if executed. False otherwise
      */
@@ -84,16 +84,29 @@ public class ChessGame {
         final var startPiece = board.getPiece(move.getStartPosition());
         final var endPiece = board.getPiece(move.getEndPosition());
         // make the move
-        board.addPiece(move.getStartPosition(), null);
+        board.removePiece(move.getStartPosition());
         board.addPiece(move.getEndPosition(), startPiece);
 
         if (isInCheck(teamColor)) {
+            // reverse the move
+            board.addPiece(move.getStartPosition(), startPiece);
+            // if the end position was not occupied we actually need to remove the piece
+            // (instead of placing null there)
+            if (endPiece != null)
+                board.addPiece(move.getEndPosition(), endPiece);
+            if (endPiece == null)
+                board.removePiece(move.getEndPosition());
             return true;
         }
 
         // reverse the move
         board.addPiece(move.getStartPosition(), startPiece);
-        board.addPiece(move.getEndPosition(), endPiece);
+        // if the end position was not occupied we actually need to remove the piece
+        // (instead of placing null there)
+        if (endPiece != null)
+            board.addPiece(move.getEndPosition(), endPiece);
+        if (endPiece == null)
+            board.removePiece(move.getEndPosition());
 
         return false;
     }
@@ -106,20 +119,38 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
 
+        final var piece = board.getPiece(move.getStartPosition());
+        if (piece == null || piece.getTeamColor() != turnTeam)
+            throw new InvalidMoveException();
+
+        final var validMoves = validMoves(move.getStartPosition());
+
+        if (validMoves == null)
+            throw new InvalidMoveException();
+
         // if the move is in the set of valid moves at the given position, make the move
+        if (validMoves.contains(move)) {
+            // make the move
+            final var promotionPieceType = move.getPromotionPiece();
+            board.removePiece(move.getStartPosition());
+            board.addPiece(move.getEndPosition(),
+                    promotionPieceType != null ? new ChessPiece(piece.getTeamColor(), promotionPieceType) : piece);
 
-        // once the move is made, set the turn to the other team (?)
-
-        throw new RuntimeException("Not implemented");
+            // alternate the team color
+            setTeamTurn(turnTeam == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
+        } else {
+            throw new InvalidMoveException();
+        }
     }
 
     private ChessPosition getKingPosition(TeamColor teamColor) {
         ChessPosition positionOfKing = null;
-        for (int row = 0; row <= ChessBoard.HEIGHT; ++row) {
-            for (int col = 0; col <= ChessBoard.WIDTH; ++col) {
+        for (int row = 1; row <= ChessBoard.HEIGHT; row++) {
+            for (int col = 1; col <= ChessBoard.WIDTH; col++) {
                 final var curPosition = new ChessPosition(row, col);
                 final var curPiece = board.getPiece(curPosition);
-                if (curPiece.getTeamColor() == teamColor && curPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                if (curPiece != null && curPiece.getTeamColor() == teamColor
+                        && curPiece.getPieceType() == ChessPiece.PieceType.KING) {
                     positionOfKing = curPosition;
                     break;
                 }
@@ -138,7 +169,11 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         // find the king of the given team (maybe keep a reference?)
         final var kingPosition = getKingPosition(teamColor);
-        
+
+        // if there is no king, it is not possible to be in check
+        if (kingPosition == null)
+            return false;
+
         final var kingRow = kingPosition.getRow();
         final var kingCol = kingPosition.getColumn();
 
@@ -181,7 +216,7 @@ public class ChessGame {
             if (surroundingPiece != null && surroundingPiece.getTeamColor() != teamColor
                     && surroundingPiece.getPieceType() == ChessPiece.PieceType.KING) {
                 return true;
-            } 
+            }
         }
 
         // check for pawns in the front left and front right positions
@@ -192,7 +227,8 @@ public class ChessGame {
                     && frontLeftPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
                 return true;
             }
-        } catch(PositionOutOfBoundsException e) {}
+        } catch (PositionOutOfBoundsException e) {
+        }
         try {
             final var frontRight = board.getNewPosition(kingRow + FORWARD, kingCol + RIGHT);
             final var frontRightPiece = board.getPiece(frontRight);
@@ -200,7 +236,8 @@ public class ChessGame {
                     && frontRightPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
                 return true;
             }
-        } catch(PositionOutOfBoundsException e) {}
+        } catch (PositionOutOfBoundsException e) {
+        }
 
         final var q = new ArrayDeque<ChessPosition>(surroundingPositions);
 
@@ -294,10 +331,13 @@ public class ChessGame {
                 final var curPosition = new ChessPosition(row, col);
                 final var curPiece = board.getPiece(curPosition);
 
-                if (curPiece.getTeamColor() != teamColor)
+                if (curPiece != null && curPiece.getTeamColor() != teamColor)
                     continue;
 
                 final var curValidMoves = validMoves(curPosition);
+
+                if (curValidMoves == null)
+                    continue;
 
                 for (ChessMove move : curValidMoves) {
                     if (!moveCausesCheck(move, teamColor))
@@ -328,6 +368,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+
         // check every position that is the team color if any piece can make a valid
         // move then return false
         for (int row = 1; row <= ChessBoard.HEIGHT; ++row) {
@@ -336,11 +377,11 @@ public class ChessGame {
                 final var curPiece = board.getPiece(curPosition);
 
                 // only consider pieces of the specified color
-                if (curPiece.getTeamColor() != teamColor)
+                if (curPiece != null && curPiece.getTeamColor() != teamColor)
                     continue;
 
                 final var validMovesAtRowCol = validMoves(curPosition);
-                if (validMovesAtRowCol != null) {
+                if (validMovesAtRowCol != null && !validMovesAtRowCol.isEmpty()) {
                     return false;
                 }
             }

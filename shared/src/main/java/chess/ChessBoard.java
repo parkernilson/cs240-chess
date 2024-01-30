@@ -87,6 +87,12 @@ public class ChessBoard {
         return board.get(position);
     }
 
+    public void removePiece(ChessPosition position) {
+        if (board.get(position) != null) {
+            board.remove(position);
+        }
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
@@ -140,6 +146,29 @@ public class ChessBoard {
         } else if (!board.equals(other.board))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int row = HEIGHT; row >= 1; row--) {
+            for (int col = 1; col <= WIDTH; col++) {
+                try {
+                    ChessPosition position = getNewPosition(row, col);
+                    Optional<ChessPiece> optionalPiece = checkPiece(position);
+                    if (optionalPiece.isPresent()) {
+                        ChessPiece piece = optionalPiece.get();
+                        sb.append(piece.getSymbol()).append(" ");
+                    } else {
+                        sb.append("- ");
+                    }
+                } catch(PositionOutOfBoundsException e) {
+                    sb.append("- ");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
 }
