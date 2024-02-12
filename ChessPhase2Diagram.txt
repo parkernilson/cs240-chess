@@ -1,0 +1,108 @@
+actor Client
+participant Server
+participant AuthService
+participant GameService
+participant AdminService
+participant DataAccess
+database db
+
+group #navy Registration #white
+Client -> Server: [POST] /user\n{username, password, email}
+Server -> AuthService: register(username, password, email)
+AuthService -> DataAccess: getUser(username)
+DataAccess -> db: SELECT username from users
+DataAccess --> AuthService: null
+AuthService -> DataAccess: createUser(username, password)
+DataAccess -> db: INSERT username, password, email INTO users
+AuthService -> DataAccess: createAuth(username)
+DataAccess -> db: INSERT username, authToken INTO auth
+DataAccess --> AuthService: authToken
+AuthService --> Server: authToken
+Server --> Client: 200 Response\n{authToken}
+end
+
+group #orange Login #white
+Client -> Server: [POST] /session\n{username, password}
+Server->AuthService: login(username, password)
+AuthService->DataAccess: getUser(username)
+DataAccess->db: SELECT username, salted_password FROM users
+db -->DataAccess: username, salted_password
+DataAccess-->AuthService: username, salted_password
+AuthService->DataAccess: getAuth(username)
+DataAccess->db: SELECT username, authToken FROM auth
+db -->DataAccess: null
+DataAccess-->AuthService: null
+AuthService->DataAccess: createAuth(username)
+DataAccess->db: INSERT username, authToken INTO auth
+DataAccess-->AuthService: username, authToken
+AuthService-->Server: username, authToken
+Server -->Client: 200 Response\n{username, authToken}
+end
+
+group #green Logout #white
+Client -> Server: [DELETE] /session\nauthToken
+Server->AuthService: logout(authToken)
+AuthService->DataAccess: deleteAuth(authToken)
+DataAccess->db:DELETE FROM auth\nWHERE authToken = authToken
+Server-->Client: 200 Response
+end
+
+group #yellow Join Game #black
+Client -> Server: [PUT] /game\nauthToken\n{ClientColor, gameID}
+Server->GameService: joinGame(authToken, clientColor, gameId)
+GameService->AuthService: getUserByToken(authToken)
+AuthService-->GameService: username, ...
+GameService->DataAccess: getGame(gameId)
+DataAccess->db: SELECT whiteUsername, ... FROM games
+db -->DataAccess: whiteUsername, ...
+DataAccess-->GameService: whiteUsername, ...
+GameService->DataAccess: getParticipants(gameId)
+DataAccess->db: SELECT username FROM participants\nWHERE username = username\nAND gameId = gameId
+db -->DataAccess: username
+DataAccess-->GameService: username
+GameService -->Server:(On success, does not throw exception)
+Server-->Client: 200 Response
+end
+
+group #purple Create Game #white
+Client -> Server: [POST] /game\nauthToken\n{gameName}
+Server->GameService: createGame(authToken, gameName)
+GameService->AuthService: getUserByToken(authToken)
+AuthService-->GameService: username, ...
+GameService->DataAccess: createGame(authToken, username)
+DataAccess->db: INSERT gameName, username AS owner INTO games
+db -->DataAccess: gameId
+DataAccess->db: INSERT gameId, username INTO participants
+DataAccess-->GameService: gameId
+GameService-->Server: gameId
+Server-->Client: 200 Response\n{gameId}
+end
+
+group #red List Games #white
+Client -> Server: [GET] /game\nauthToken
+Server->GameService: listGames(authToken)
+GameService->AuthService: getUserByToken(authToken)
+AuthService-->GameService: username, ...
+GameService->DataAccess: listGames(username)
+DataAccess->db: SELECT * FROM games\nJOIN participants as p\nWHERE owner = username\nOR p.username = username
+db -->DataAccess: [{gameId, gameName, ...}]
+DataAccess-->GameService: [{gameId, gameName, ...}]
+GameService-->Server: [{gameId, gameName, ...}]
+Server-->Client: 200 Response\n{games: [{gameId, gameName, ...}]}
+end
+
+group #gray Clear application #white
+Client -> Server: [DELETE] /db
+Server->AdminService: clearApplication()
+AdminService->GameService: deleteAllGames()
+GameService->DataAccess: deleteAllGames()
+DataAccess->db: DELETE FROM games
+DataAccess->db: DELETE FROM participants
+AdminService->AuthService: deleteAllUsers()
+AuthService->DataAccess: deleteAllUsers()
+DataAccess->db: DELETE FROM users
+AdminService->AuthService: deleteAllAuth()
+AuthService ->DataAccess: deleteAllAuth()
+DataAccess->db: DELETE FROM auth
+Server-->Client: 200 Response
+end

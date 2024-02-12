@@ -2,39 +2,5 @@
 
 This project demonstrates mastery of proper software design, client/server architecture, networking using HTTP and WebSocket, database persistence, unit testing, serialization, and security.
 
-## 10k Architecture Overview
-
-The application implements a multiplayer chess server and a command line chess client.
-
-[![Sequence Diagram](10k-architecture.png)](https://sequencediagram.org/index.html#initialData=C4S2BsFMAIGEAtIGckCh0AcCGAnUBjEbAO2DnBElIEZVs8RCSzYKrgAmO3AorU6AGVIOAG4jUAEyzAsAIyxIYAERnzFkdKgrFIuaKlaUa0ALQA+ISPE4AXNABWAexDFoAcywBbTcLEizS1VZBSVbbVc9HGgnADNYiN19QzZSDkCrfztHFzdPH1Q-Gwzg9TDEqJj4iuSjdmoMopF7LywAaxgvJ3FC6wCLaFLQyHCdSriEseSm6NMBurT7AFcMaWAYOSdcSRTjTka+7NaO6C6emZK1YdHI-Qma6N6ss3nU4Gpl1ZkNrZwdhfeByy9hwyBA7mIT2KAyGGhuSWi9wuc0sAI49nyMG6ElQQA)
-
-## IntelliJ Support
-
-Open the project directory in IntelliJ in order to develop, run, and debug your code using an IDE.
-
-## Maven Support
-
-You can use the following commands to build, test, package, and run your code.
-
-| Command                    | Description                                     |
-| -------------------------- | ----------------------------------------------- |
-| `mvn compile`              | Builds the code                                 |
-| `mvn package`              | Run the tests and build an Uber jar file        |
-| `mvn package -DskipTests`  | Build an Uber jar file                          |
-| `mvn install`              | Installs the packages into the local repository |
-| `mvn test`                 | Run all the tests                               |
-| `mvn -pl shared tests`     | Run all the shared tests                        |
-| `mvn -pl client exec:java` | Build and run the client `Main`                 |
-| `mvn -pl server exec:java` | Build and run the server `Main`                 |
-
-These commands are configured by the `pom.xml` (Project Object Model) files. There is a POM file in the root of the project, and one in each of the modules. The root POM defines any global dependencies and references the module POM files.
-
-### Running the program using Java
-
-Once you have compiled your project into an uber jar, you can execute it with the following command.
-
-```sh
-java -jar client/target/client-jar-with-dependencies.jar
-
-♕ 240 Chess Client: chess.ChessPiece@7852e922
-```
+# Sequence Diagram for Server-side Application
+[Sequence Diagram](https://sequencediagram.org/index.html?presentationMode=readOnly&shrinkToFit=true#initialData=IYYwLg9gTgBAwgGwJYFMB2YBQAHYUxIhK4YwDKKUAbpTngUSWDAIICuYAFhdYSnfkLFgpAOLAAtih5U+AhsNIsAJhKRoZc3IMYjmAEWBhgLECBQBnC5mVHgAI2AWUMZfcyYA5lAhtsMAGI0YCoATxgAJRRPJAswKCMkCDRAgHdOJDB+RFRSAFoAPnJKGigALhgAbQAFAHkyABUAXRgAejZnKAAdNABvDspgqQAaGFwrVOhlUZQJYCQEAF9MGUoYQtYObhK+Cqho2KyoAAoBqCGUUfGLSahpmFn5hABKTHYuTXN1osNjU3MrBVPCgwABVTqnToXV6-ExmSwWb6uewVMgAUQAMmi4A0YGcLjAAGY+CR4zrWWH-BHrDbvba8cwVNBsBAIN5bT4uDaU+GAmAgfZGFDgyiQwaSS5jJw3KYwuxUqxItwVACSADl0RFcfiJVdpbd7o8FjB1Q1amTKNY6ZykTyARYKgKUEK6WLzhK5X9eYiNsqTRq0VqLe6RjBgFsGhAANbof1msNbTB26l5WkcnaMhNcSMxtDsj4ZrkbVblLOcHPoFYlNapoo5dBgCoAJgADC3IpZsMlnD1euHs9H0Mt0MoPN5fP4AtARMCYBiIDEUgF0plssgG0iSxUavVmm1nFYkmhezrQ9cDcsS4VrYWKggF+o3Rc9RNZfn6bJzIVk3zgWCIaeKCenC9qFH66JYjiwbPjAFjAAgWTKAA+ueUwwAAYhEtQALLBtYbg0gUP4OtBuqwfBiEofqUxJvK3q1jeDIoBUgGjHBCEoMhqF3O+nLfnR9pAiCrqAcBCoWGBKLkJi2LalCZH9uWg4pJhOFljY9iEcRTIsmyxEMemTE6ayvGFvxXqCfygpZCJ8lSGJ9EFH66qanJ4qhopFYpKa5qKbRFkIgZBZGaRHkRspplMbWW6hZKnkRSWhH1hgzZth2FhdmgPZ9KxZZecOaCjl4Ph+IE3goLG86eL4zDLhkWSYMlzDFtWpaVPoMkNGiLStAeFhHj08W5lW1CUNehmfsxMD3tVHDHEN6CvIxk3mSBCIVMoKAICCKCugtaAOaBTkoh1WJdRhWG4YpPQAOoABKBmieXKTAAC8z3DVehRNal7ZRBl3b8COY4lZOoRbfeqQwAAUhA6gwOIUiBPYCCgFGjXrvkRQxTUoJ7q0ngSoN4W5r2TVwBA95QKMhNSCq+iXq1hSI9It4wAAVnDaAs-NJPoKMICY2AFNUzTEoqsorws3xBTLbsMB-iKUAAEKhF5vMDrmS0TXwtbS2zuUAHTG5g+tRURAnrQrII87TKAS4dgXHaiMlQSuWRKzBxuGxdal2-hmm1tpMDu8KdmSt7-lrVYesSpyFSh57ZGR2bK0WwFv4gtU9BCEwFjHHbDtR+Jkku5Bbkhi4qm4doCh57dD0RE9gFvbFPQsGq+gK+Lyit4Xo4EUHlt8oBxf0czccG+HpuT0xhFbsctQpBYbDeqMygQJYMBoBAzBcD4UMoAAHuY2AEMkrxfQUP0wK2f2doDmDA8VE6BNgbBQNg23wNZLgs2k9U1y5GatjVq246iNB6nbYmmt0C9jtmqCUjNRpQAnlIeOVlnRZB5vtMWUhEH2RnugsyssdaZkVp0VW6t9ra2CitNBrMQpGxNqnXW6do4kSdEKHBfM0CjFEmPI6zkAxBgQWRFuLAyAwAgKkNAawfLdykAHLSw8SL90EU7YRrlFH23uC3BRtdc56ApKo2OxCQrqNYV+QoMV1FXxvnfdKmVsq9H7gVIq45SoBH2L3DEhwEYSkRHVVcGNgGbjAVUUQaJ8bQOCLwkapQGEYOQHEFm+caFEMYWnOW5CQRKyocpDWSktaRXoQUKxU1mGG0yTLYOKSwBpKfB6DRMdnbSXLjAAAVL7XC-sejQ1qOqKUOhFBgERE4MYDdHrSNkWsd6gEei1AiGMQ2Ld5nT0HqtcS25XE9zwSgAhEdjaLCaC0iSSS2aVF2XTe4YjQzexOTUsyNiIlXP7vsw5owHmnPsULX6TjAbwMCTs95OjPkwG+e4kGr8AjeGAOERAzpYDAGwF-QgiRkgAJCU1cJKDtynWid1NobgEljVlqodQGDBZIpYKi5AIAMVoGOEtClGgSEVI2ltHaLBWSNKlrPNOwdNrbRsrywJzKzmlxgAS861cdEmIzhJNpMqnpysMboDAVpWUyxyVNYV3LWRK3zrQj8bChVctFQgI1Er9LKs6qqy6eE3japIbqzlIrdqsldCam0WzvTuoNQgb1kq7VnQdWpPyvzgH-P+s4oGhVMBAA)
