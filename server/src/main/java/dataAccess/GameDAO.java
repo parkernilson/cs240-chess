@@ -1,7 +1,7 @@
 package dataAccess;
 
 import model.GameData;
-import model.UserData;
+// import model.UserData;
 
 public interface GameDAO {
     public GameData getGame(int gameId);
@@ -13,6 +13,6 @@ public interface GameDAO {
     public void deleteGame(int gameId);
     public void deleteAllGames();
 
-    public UserData[] listParticipants(int gameId);
-    public UserData addParticipant(int gameId, UserData user);
+    // public UserData[] listParticipants(int gameId);
+    // public UserData addParticipant(int gameId, UserData user);
 }

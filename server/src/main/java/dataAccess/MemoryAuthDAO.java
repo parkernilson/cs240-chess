@@ -6,15 +6,22 @@ import java.util.Map;
 import model.AuthData;
 
 public class MemoryAuthDAO implements AuthDAO {
+    /**
+     * A map of auth tokens to auth data.
+     */
     private Map<String, AuthData> auths = new HashMap<String, AuthData>();
 
-    public AuthData getAuth(String username) {
-        return auths.get(username);
+    public AuthData getAuth(String authToken) {
+        return auths.get(authToken);
     }
 
+    /**
+     * Create an auth for the given user
+     */
     public AuthData createAuth(String username) {
-        AuthData auth = new AuthData(username, "token");
-        auths.put(username, auth);
+        String authToken = "token"; // TODO: generate a real token
+        AuthData auth = new AuthData(authToken, username);
+        auths.put(authToken, auth);
         return auth;
     }
 
