@@ -5,7 +5,7 @@ import chess.ChessGame;
 public record GameData(
         int gameId,
         String whiteUsername,
-        String backUsername,
+        String blackUsername,
         String gameName,
         ChessGame game) {
 }
