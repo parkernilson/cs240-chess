@@ -39,7 +39,7 @@ public class Server {
         // Logout
         Spark.delete("/session", (req, res) -> {
             res.status(200);
-            return null;
+            return "";
         });
 
         // List Games
@@ -66,7 +66,7 @@ public class Server {
         // Join Game
         Spark.put("/game", (req, res) -> {
             res.status(200);
-            return null;
+            return "";
         });
 
         Spark.awaitInitialization();
