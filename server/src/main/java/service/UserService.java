@@ -26,6 +26,14 @@ public class UserService {
         return authDAO.createAuth(username);
     }
 
+    public void deleteAuth(String authToken) {
+        authDAO.deleteAuth(authToken);
+    }
+
+    public AuthData getAuthByUsername(String username) {
+        return authDAO.getAuthByUsername(username);
+    }
+
     public void deleteUser(String username) {
         final var auth = authDAO.getAuthByUsername(username);
         userDAO.deleteUser(username);
