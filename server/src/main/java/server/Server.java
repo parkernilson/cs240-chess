@@ -12,6 +12,7 @@ import dataAccess.MemoryGameDAO;
 import dataAccess.MemoryUserDAO;
 import model.GameData;
 import server.handlers.ClearApplicationHandler;
+import server.handlers.RegisterHandler;
 import service.AdminService;
 import service.GameService;
 import service.UserService;
@@ -26,20 +27,15 @@ public class Server {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
-        UserService authService = new UserService(userDAO, authDAO);
+        UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO);
-        AdminService adminService = new AdminService(authService, gameService);
+        AdminService adminService = new AdminService(userService, gameService);
 
         // Clear Application
         Spark.delete("/db", new ClearApplicationHandler(adminService)::handle);
 
         // Register
-        Spark.post("/user", (req, res) -> {
-            res.status(200);
-            return new Gson().toJson(Map.of(
-                    "username", "usernamehere",
-                    "authToken", "tokenhere"));
-        });
+        Spark.post("/user", new RegisterHandler(userService)::handle);
 
         // Login
         Spark.post("/session", (req, res) -> {

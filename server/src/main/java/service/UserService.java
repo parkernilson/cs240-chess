@@ -2,14 +2,34 @@ package service;
 
 import dataAccess.AuthDAO;
 import dataAccess.UserDAO;
+import model.AuthData;
+import model.UserData;
 
 public class UserService {
-    public UserDAO userDAO;
-    public AuthDAO authDAO;
+    private UserDAO userDAO;
+    private AuthDAO authDAO;
 
     public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
+    }
+
+    public UserData getUser(String username) {
+        return userDAO.getUser(username);
+    }
+
+    public UserData createUser(UserData userData) {
+        return userDAO.createUser(userData);
+    }
+
+    public AuthData createAuth(String username) {
+        return authDAO.createAuth(username);
+    }
+
+    public void deleteUser(String username) {
+        final var auth = authDAO.getAuthByUsername(username);
+        userDAO.deleteUser(username);
+        authDAO.deleteAuth(auth.authToken());
     }
 
     public void deleteAllUsers() {
