@@ -43,7 +43,7 @@ public class LoginHandler {
                 return new Gson().toJson(Map.of("message", "Error: unauthorized"));
             }
 
-            final var newAuth = userService.refreshAuth(username);
+            final var newAuth = userService.createAuth(username);
 
             res.status(200);
             return new Gson().toJson(Map.of(

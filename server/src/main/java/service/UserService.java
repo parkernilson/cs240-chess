@@ -28,14 +28,13 @@ public class UserService {
 
     public UserData getByAuthToken(String authToken) {
         final var auth = authDAO.getAuth(authToken);
+        if (auth == null) {
+            return null;
+        }
         return userDAO.getUser(auth.username());
     }
 
-    public AuthData refreshAuth(String username) {
-        final var existingAuth = authDAO.getAuthByUsername(username);
-        if (existingAuth != null) {
-            authDAO.deleteAuth(existingAuth.authToken());
-        }
+    public AuthData createAuth(String username) {
         return authDAO.createAuth(username);
     }
 

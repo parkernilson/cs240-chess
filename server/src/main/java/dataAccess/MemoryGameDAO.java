@@ -16,16 +16,16 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     public GameData createGame(GameData game) {
-        games.put(game.gameId(), game);
+        games.put(game.gameID(), game);
         return game;
     }
 
     public GameData updateGame(GameData game) throws DataAccessException {
-        final var existingGame = games.get(game.gameId());
+        final var existingGame = games.get(game.gameID());
         if (existingGame == null) {
-            throw new DataAccessException("Game " + game.gameId() + " does not exist");
+            throw new DataAccessException("Game " + game.gameID() + " does not exist");
         }
-        games.put(game.gameId(), game);
+        games.put(game.gameID(), game);
         return game;
     }
 

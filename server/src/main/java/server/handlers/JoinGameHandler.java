@@ -30,7 +30,7 @@ public class JoinGameHandler {
             final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
             playerColorString = requestBody.playerColor();
             gameId = requestBody.gameID();
-            if (playerColorString == null || gameId < 0) {
+            if (gameId < 0) {
                 throw new Exception();
             }
         } catch (Exception e) {
@@ -50,17 +50,20 @@ public class JoinGameHandler {
                 return new Gson().toJson(Map.of("message", "Error: Unauthorized"));
             }
 
-            final var playerColor = playerColorString == null ? null
-                    : (playerColorString == "WHITE" ? ChessGame.TeamColor.WHITE
-                            : ChessGame.TeamColor.BLACK);
+            final var playerColor = playerColorString == null ? null : ChessGame.TeamColor.valueOf(playerColorString);
+
+            final var game = gameService.getGame(gameId);
+            if (game == null) {
+                res.status(400);
+                return new Gson().toJson(Map.of("message", "Error: bad request"));
+            }
 
             if (playerColor != null) {
-                final var game = gameService.getGame(gameId);
                 final var requestedColorUsername = playerColor == ChessGame.TeamColor.WHITE ? game.whiteUsername()
                         : game.blackUsername();
                 if (requestedColorUsername != null) {
                     res.status(403);
-                    return "Error: already taken";
+                    return new Gson().toJson(Map.of("message", "Error: already taken"));
                 }
                 gameService.addParticipant(gameId, user.username(), playerColor);
             }
