@@ -13,6 +13,7 @@ import dataAccess.MemoryUserDAO;
 import model.GameData;
 import server.handlers.ClearApplicationHandler;
 import server.handlers.LoginHandler;
+import server.handlers.LogoutHandler;
 import server.handlers.RegisterHandler;
 import service.AdminService;
 import service.GameService;
@@ -42,10 +43,7 @@ public class Server {
         Spark.post("/session", new LoginHandler(userService)::handle);
 
         // Logout
-        Spark.delete("/session", (req, res) -> {
-            res.status(200);
-            return "";
-        });
+        Spark.delete("/session", new LogoutHandler(userService)::handle);
 
         // List Games
         Spark.get("/game", (req, res) -> {
