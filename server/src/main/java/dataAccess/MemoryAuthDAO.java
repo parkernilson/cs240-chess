@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import model.AuthData;
+import util.TokenGenerator;
 
 public class MemoryAuthDAO implements AuthDAO {
     /**
@@ -28,7 +29,7 @@ public class MemoryAuthDAO implements AuthDAO {
      * Create an auth for the given user
      */
     public AuthData createAuth(String username) {
-        String authToken = "token"; // TODO: generate a real token
+        String authToken = TokenGenerator.generateToken();
         AuthData auth = new AuthData(authToken, username);
         auths.put(authToken, auth);
         return auth;
