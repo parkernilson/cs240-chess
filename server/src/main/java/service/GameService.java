@@ -33,6 +33,9 @@ public class GameService {
     }
 
     public void addParticipant(int gameId, String username, ChessGame.TeamColor color) throws DataAccessException {
-        gameDAO.addParticipant(gameId, username, color);
+        final var game = gameDAO.getGame(gameId);
+        final var newGame = new GameData(gameId, color == ChessGame.TeamColor.WHITE ? username : game.whiteUsername(),
+                color == ChessGame.TeamColor.BLACK ? username : game.blackUsername(), game.gameName(), game.game());
+        gameDAO.updateGame(newGame);
     }
 }
