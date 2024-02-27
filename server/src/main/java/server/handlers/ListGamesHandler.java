@@ -21,15 +21,30 @@ public class ListGamesHandler {
     }
 
     public Object handle(Request req, Response res) {
-        String authToken = req.headers("Authorization");
+        try {
+            String authToken = req.headers("Authorization");
 
-        UserData user = userService.getByAuthToken(authToken);
+            if (authToken == null) {
+                res.status(401);
+                return new Gson().toJson(Map.of("message", "Error: unauthorized"));
+            }
 
-        GameData[] games = gameService.listGames(user.username());
+            UserData user = userService.getByAuthToken(authToken);
 
-        res.status(200);
-        return new Gson().toJson(Map.of(
-            "games", games
-        ));
+            if (user == null) {
+                res.status(401);
+                return new Gson().toJson(Map.of("message", "Error: unauthorized"));
+            }
+
+            GameData[] games = gameService.listGames(user.username());
+
+            res.status(200);
+            return new Gson().toJson(Map.of(
+                "games", games
+            ));
+        } catch(Exception e) {
+            res.status(500);
+            return new Gson().toJson("Error: Internal server error");
+        }
     }
 }
