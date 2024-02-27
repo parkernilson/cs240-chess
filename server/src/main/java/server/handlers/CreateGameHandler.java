@@ -33,7 +33,7 @@ public class CreateGameHandler {
             }
         } catch(Exception e) {
             res.status(400);
-            return new Gson().toJson("Error: bad request");
+            return new Gson().toJson(Map.of("message", "Error: bad request"));
         }
 
         try {

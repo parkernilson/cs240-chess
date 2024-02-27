@@ -44,7 +44,7 @@ public class ListGamesHandler {
             ));
         } catch(Exception e) {
             res.status(500);
-            return new Gson().toJson("Error: Internal server error");
+            return new Gson().toJson(Map.of("message", "Error: Internal server error"));
         }
     }
 }

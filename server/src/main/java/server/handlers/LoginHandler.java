@@ -32,7 +32,7 @@ public class LoginHandler {
             }
         } catch(Exception e) {
             res.status(400);
-            return new Gson().toJson("Error: bad request");
+            return new Gson().toJson(Map.of("message", "Error: bad request"));
         }
 
         try {
@@ -40,7 +40,7 @@ public class LoginHandler {
 
             if (user == null || !user.password().equals(password)) {
                 res.status(401);
-                return new Gson().toJson("Error: unauthorized");
+                return new Gson().toJson(Map.of("message", "Error: unauthorized"));
             }
 
             final var newAuth = userService.refreshAuth(username);
@@ -52,7 +52,7 @@ public class LoginHandler {
             ));
         } catch(Exception e) {
             res.status(500);
-            return new Gson().toJson("Error: Internal server error");
+            return new Gson().toJson(Map.of("message", "Error: Internal server error"));
         }
     }
 }
