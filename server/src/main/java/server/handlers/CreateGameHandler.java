@@ -23,25 +23,44 @@ public class CreateGameHandler {
     }
 
     public Object handle(Request req, Response res) {
-        final var authToken = req.headers("Authorization");
-        final var user = userService.getByAuthToken(authToken);
+        try {
+            final var authToken = req.headers("Authorization");
+            if (authToken == null) {
+                res.status(401);
+                return new Gson().toJson(Map.of("message", "Error: unauthorized"));
+            }
 
-        final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
-        final String gameName = requestBody.gameName();
+            final var user = userService.getByAuthToken(authToken);
+            if (user == null) {
+                res.status(401);
+                return new Gson().toJson(Map.of("message", "Error: unauthorized"));
+            }
 
-        final int gameId = gameService.getNextGameId();
-        final var gameData = gameService.createGame(new GameData(
-                gameId,
-                null,
-                null,
-                gameName,
-                new ChessGame()));
+            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            final String gameName = requestBody.gameName();
 
-        gameService.createGame(gameData);
+            if (gameName == null) {
+                res.status(400);
+                return new Gson().toJson("Error: bad request");
+            }
 
-        res.status(200);
-        return new Gson().toJson(Map.of(
-            "gameID", gameId
-        ));
+            final int gameId = gameService.getNextGameId();
+            final var gameData = gameService.createGame(new GameData(
+                    gameId,
+                    null,
+                    null,
+                    gameName,
+                    new ChessGame()));
+
+            gameService.createGame(gameData);
+
+            res.status(200);
+            return new Gson().toJson(Map.of(
+                "gameID", gameId
+            ));
+        } catch(Exception e) {
+            res.status(500);
+            return "Error: Internal server error";
+        }
     }
 }
