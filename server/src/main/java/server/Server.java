@@ -12,6 +12,7 @@ import dataAccess.MemoryGameDAO;
 import dataAccess.MemoryUserDAO;
 import model.GameData;
 import server.handlers.ClearApplicationHandler;
+import server.handlers.ListGamesHandler;
 import server.handlers.LoginHandler;
 import server.handlers.LogoutHandler;
 import server.handlers.RegisterHandler;
@@ -46,18 +47,7 @@ public class Server {
         Spark.delete("/session", new LogoutHandler(userService)::handle);
 
         // List Games
-        Spark.get("/game", (req, res) -> {
-            res.status(200);
-            return new Gson().toJson(Map.of(
-                    "games", new GameData[] {
-                            new GameData(
-                                    0,
-                                    "whiteuser",
-                                    "blackuser",
-                                    "gamename",
-                                    new ChessGame())
-                    }));
-        });
+        Spark.get("/game", new ListGamesHandler(gameService, userService)::handle);
 
         // Create Game
         Spark.post("/game", (req, res) -> {

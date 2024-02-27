@@ -22,6 +22,11 @@ public class UserService {
         return userDAO.createUser(userData);
     }
 
+    public UserData getByAuthToken(String authToken) {
+        final var auth = authDAO.getAuth(authToken);
+        return userDAO.getUser(auth.username());
+    }
+
     public AuthData createAuth(String username) {
         return authDAO.createAuth(username);
     }
