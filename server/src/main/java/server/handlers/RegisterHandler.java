@@ -20,19 +20,19 @@ public class RegisterHandler {
     }
 
     public Object handle(Request req, Response res) {
-        final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
-        final String username = requestBody.username();
-        final String password = requestBody.password();
-        final String email = requestBody.email();
-
-        if (username == null || password == null || email == null) {
-            res.status(400);
-            return new Gson().toJson(Map.of(
-                "message", "Error: bad request"
-            ));
-        }
-
         try {
+            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            final String username = requestBody.username();
+            final String password = requestBody.password();
+            final String email = requestBody.email();
+
+            if (username == null || password == null || email == null) {
+                res.status(400);
+                return new Gson().toJson(Map.of(
+                    "message", "Error: bad request"
+                ));
+            }
+
             // look up the user to see if they exist already
             final var existingUser = userService.getUser(username);
 

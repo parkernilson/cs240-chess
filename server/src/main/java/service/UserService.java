@@ -18,6 +18,10 @@ public class UserService {
         return userDAO.getUser(username);
     }
 
+    public AuthData getAuth(String authToken) {
+        return authDAO.getAuth(authToken);
+    }
+
     public UserData createUser(UserData userData) {
         return userDAO.createUser(userData);
     }

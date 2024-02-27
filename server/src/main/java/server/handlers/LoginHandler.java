@@ -19,16 +19,16 @@ public class LoginHandler {
     }
 
     public Object handle(Request req, Response res) {
-        final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
-        final String username = requestBody.username();
-        final String password = requestBody.password();
-        
-        if (username == null || password == null) {
-            res.status(400);
-            return new Gson().toJson("Error: username and password are required");
-        }
-
         try {
+            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            final String username = requestBody.username();
+            final String password = requestBody.password();
+            
+            if (username == null || password == null) {
+                res.status(400);
+                return new Gson().toJson("Error: username and password are required");
+            }
+
             final var user = userService.getUser(username);
 
             if (user == null || !user.password().equals(password)) {
