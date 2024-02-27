@@ -17,4 +17,12 @@ public class GameService {
     public GameData[] listGames(String username) {
         return gameDAO.listGames(username);
     }
+
+    public GameData createGame(GameData gameData) {
+        return gameDAO.createGame(gameData);
+    }
+
+    public int getNextGameId() {
+        return gameDAO.getMaxGameId() + 1;
+    }
 }

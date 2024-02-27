@@ -27,4 +27,8 @@ public class MemoryGameDAO implements GameDAO {
     public void deleteAllGames() {
         games.clear();
     }
+
+    public int getMaxGameId() {
+        return games.keySet().stream().max(Integer::compare).orElse(0);
+    }
 }

@@ -13,6 +13,8 @@ public interface GameDAO {
     public void deleteGame(int gameId);
     public void deleteAllGames();
 
+    public int getMaxGameId();
+
     // public UserData[] listParticipants(int gameId);
     // public UserData addParticipant(int gameId, UserData user);
 }
