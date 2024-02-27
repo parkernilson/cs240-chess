@@ -1,5 +1,7 @@
 package server.handlers;
 
+import java.util.Map;
+
 import com.google.gson.Gson;
 
 import chess.ChessGame;
@@ -21,23 +23,44 @@ public class JoinGameHandler {
     }
 
     public Object handle(Request req, Response res) {
-        final var authToken = req.headers("Authorization");
-        final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
-
-        final var user = userService.getByAuthToken(authToken);
-
-        final var playerColor = requestBody.playerColor() == "WHITE" ? ChessGame.TeamColor.WHITE
-                : ChessGame.TeamColor.BLACK;
-        final var gameID = requestBody.gameID();
-
         try {
-            gameService.addParticipant(gameID, user.username(), playerColor);
-        } catch( Exception e) {
-            res.status(400);
-            return e.getMessage();
-        }
+            final var authToken = req.headers("Authorization");
+            if (authToken == null) {
+                res.status(401);
+                return new Gson().toJson(Map.of("message", "Error: Unauthorized"));
+            }
+            final var user = userService.getByAuthToken(authToken);
+            if (user == null) {
+                res.status(401);
+                return new Gson().toJson(Map.of("message", "Error: Unauthorized"));
+            }
 
-        res.status(200);
-        return "";
+            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            final var playerColor = requestBody.playerColor() == "WHITE" ? ChessGame.TeamColor.WHITE
+                    : ChessGame.TeamColor.BLACK;
+            final var gameId = requestBody.gameID();
+
+            if (playerColor == null || gameId < 0) {
+                res.status(400);
+                return new Gson().toJson(Map.of("message", "Error: bad request"));
+            }
+
+            if (playerColor != null) {
+                final var game = gameService.getGame(gameId);
+                final var requestedColorUsername = playerColor == ChessGame.TeamColor.WHITE ? game.whiteUsername()
+                        : game.blackUsername();
+                if (requestedColorUsername != null) {
+                    res.status(403);
+                    return "Error: already taken";
+                }
+                gameService.addParticipant(gameId, user.username(), playerColor);
+            }
+
+            res.status(200);
+            return "";
+        } catch(Exception e) {
+            res.status(500);
+            return "Error: Internal server error";
+        }
     }
 }

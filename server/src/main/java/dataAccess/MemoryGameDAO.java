@@ -39,11 +39,7 @@ public class MemoryGameDAO implements GameDAO {
         if (game == null) {
             throw new DataAccessException(username + " tried to join game " + gameId + " but it does not exist");
         }
-
-        // check if the color is taken
-
-        // add the participant to the game
-
-        // update the game with the new participant
+        games.put(gameId, new GameData(gameId, color == ChessGame.TeamColor.WHITE ? username : game.whiteUsername(),
+                color == ChessGame.TeamColor.BLACK ? username : game.blackUsername(), game.gameName(), game.game()));
     }
 }

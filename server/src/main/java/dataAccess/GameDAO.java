@@ -15,6 +15,5 @@ public interface GameDAO {
 
     public int getMaxGameId();
 
-    // public UserData[] listParticipants(int gameId);
     public void addParticipant(int gameId, String username, ChessGame.TeamColor color) throws DataAccessException;
 }

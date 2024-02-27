@@ -1,16 +1,10 @@
 package server;
 
-import java.util.Map;
-
 import spark.*;
 
-import com.google.gson.Gson;
-
-import chess.ChessGame;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
 import dataAccess.MemoryUserDAO;
-import model.GameData;
 import server.handlers.ClearApplicationHandler;
 import server.handlers.CreateGameHandler;
 import server.handlers.JoinGameHandler;
