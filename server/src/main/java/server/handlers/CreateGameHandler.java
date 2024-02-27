@@ -2,8 +2,6 @@ package server.handlers;
 
 import java.util.Map;
 
-import org.springframework.security.core.userdetails.User;
-
 import com.google.gson.Gson;
 
 import chess.ChessGame;

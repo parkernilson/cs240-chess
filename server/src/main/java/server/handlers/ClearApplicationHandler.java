@@ -1,5 +1,9 @@
 package server.handlers;
 
+import java.util.Map;
+
+import com.google.gson.Gson;
+
 import service.AdminService;
 import spark.Request;
 import spark.Response;
@@ -11,14 +15,14 @@ public class ClearApplicationHandler {
         this.adminService = adminService;
     }
 
-    public Object handle(Request req, Response res) throws Exception {
+    public Object handle(Request req, Response res) {
         try {
             adminService.clearApplication();
             res.status(200);
             return "";
-        } catch(Exception e) {
+        } catch (Exception e) {
             res.status(500);
-            return e.getMessage();
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         }
     }
 }

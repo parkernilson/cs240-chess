@@ -2,7 +2,6 @@ package dataAccess;
 
 import chess.ChessGame;
 import model.GameData;
-import model.UserData;
 
 public interface GameDAO {
     public GameData getGame(int gameId);
