@@ -23,26 +23,29 @@ public class LoginHandler {
         final String username = requestBody.username();
         final String password = requestBody.password();
         
-        final var user = userService.getUser(username);
-
-        if (user == null || !user.password().equals(password)) {
-            res.status(403);
-            return new Gson().toJson("Error: invalid username or password");
+        if (username == null || password == null) {
+            res.status(400);
+            return new Gson().toJson("Error: username and password are required");
         }
 
-        final var existingAuth = userService.getAuthByUsername(username);
+        try {
+            final var user = userService.getUser(username);
 
-        if (existingAuth != null) {
-            userService.deleteAuth(existingAuth.authToken());
+            if (user == null || !user.password().equals(password)) {
+                res.status(401);
+                return new Gson().toJson("Error: unauthorized");
+            }
+
+            final var newAuth = userService.refreshAuth(username);
+
+            res.status(200);
+            return new Gson().toJson(Map.of(
+                "username", username,
+                "authToken", newAuth.authToken()
+            ));
+        } catch(Exception e) {
+            res.status(500);
+            return new Gson().toJson("Error: Internal server error");
         }
-
-        final var newAuth = userService.createAuth(username);
-
-        res.status(200);
-
-        return new Gson().toJson(Map.of(
-            "username", username,
-            "authToken", newAuth.authToken()
-        ));
     }
 }

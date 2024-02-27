@@ -47,7 +47,7 @@ public class RegisterHandler {
             userService.createUser(new UserData(username, password, email));
 
             // create a new session for the user
-            final var auth = userService.createAuth(username);
+            final var auth = userService.refreshAuth(username);
 
             // respond with the auth token and username
             return new Gson().toJson(Map.of(

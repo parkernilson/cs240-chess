@@ -27,7 +27,7 @@ public class UserService {
         return userDAO.getUser(auth.username());
     }
 
-    public AuthData createAuth(String username) {
+    public AuthData refreshAuth(String username) {
         final var existingAuth = authDAO.getAuthByUsername(username);
         if (existingAuth != null) {
             authDAO.deleteAuth(existingAuth.authToken());
