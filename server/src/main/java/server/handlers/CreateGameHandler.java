@@ -23,6 +23,19 @@ public class CreateGameHandler {
     }
 
     public Object handle(Request req, Response res) {
+        String gameName;
+
+        try {
+            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            gameName = requestBody.gameName();
+            if (gameName == null) {
+                throw new Exception();
+            }
+        } catch(Exception e) {
+            res.status(400);
+            return new Gson().toJson("Error: bad request");
+        }
+
         try {
             final var authToken = req.headers("Authorization");
             if (authToken == null) {
@@ -34,14 +47,6 @@ public class CreateGameHandler {
             if (user == null) {
                 res.status(401);
                 return new Gson().toJson(Map.of("message", "Error: unauthorized"));
-            }
-
-            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
-            final String gameName = requestBody.gameName();
-
-            if (gameName == null) {
-                res.status(400);
-                return new Gson().toJson("Error: bad request");
             }
 
             final int gameId = gameService.getNextGameId();

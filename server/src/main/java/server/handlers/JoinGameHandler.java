@@ -23,6 +23,21 @@ public class JoinGameHandler {
     }
 
     public Object handle(Request req, Response res) {
+        String playerColorString;
+        int gameId;
+
+        try {
+            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            playerColorString = requestBody.playerColor();
+            gameId = requestBody.gameID();
+            if (playerColorString == null || gameId < 0) {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            res.status(400);
+            return new Gson().toJson(Map.of("message", "Error: bad request"));
+        }
+
         try {
             final var authToken = req.headers("Authorization");
             if (authToken == null) {
@@ -35,15 +50,9 @@ public class JoinGameHandler {
                 return new Gson().toJson(Map.of("message", "Error: Unauthorized"));
             }
 
-            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
-            final var playerColor = requestBody.playerColor() == "WHITE" ? ChessGame.TeamColor.WHITE
-                    : ChessGame.TeamColor.BLACK;
-            final var gameId = requestBody.gameID();
-
-            if (playerColor == null || gameId < 0) {
-                res.status(400);
-                return new Gson().toJson(Map.of("message", "Error: bad request"));
-            }
+            final var playerColor = playerColorString == null ? null
+                    : (playerColorString == "WHITE" ? ChessGame.TeamColor.WHITE
+                            : ChessGame.TeamColor.BLACK);
 
             if (playerColor != null) {
                 final var game = gameService.getGame(gameId);
@@ -58,7 +67,7 @@ public class JoinGameHandler {
 
             res.status(200);
             return "";
-        } catch(Exception e) {
+        } catch (Exception e) {
             res.status(500);
             return "Error: Internal server error";
         }
