@@ -22,7 +22,7 @@ public class ClearApplicationHandler {
             return "";
         } catch (Exception e) {
             res.status(500);
-            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
+            return new Gson().toJson(Map.of("message", "Error: Internal server error"));
         }
     }
 }

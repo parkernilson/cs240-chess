@@ -28,6 +28,10 @@ public class UserService {
     }
 
     public AuthData createAuth(String username) {
+        final var existingAuth = authDAO.getAuthByUsername(username);
+        if (existingAuth != null) {
+            authDAO.deleteAuth(existingAuth.authToken());
+        }
         return authDAO.createAuth(username);
     }
 

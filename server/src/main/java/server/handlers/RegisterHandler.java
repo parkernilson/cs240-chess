@@ -25,26 +25,40 @@ public class RegisterHandler {
         final String password = requestBody.password();
         final String email = requestBody.email();
 
-        // look up the user to see if they exist already
-        final var existingUser = userService.getUser(username);
-
-        if (existingUser != null) {
-            res.status(403);
+        if (username == null || password == null || email == null) {
+            res.status(400);
             return new Gson().toJson(Map.of(
-                "message", "Error: already taken"
+                "message", "Error: bad request"
             ));
         }
 
-        // if the user does not exist, create them
-        userService.createUser(new UserData(username, password, email));
+        try {
+            // look up the user to see if they exist already
+            final var existingUser = userService.getUser(username);
 
-        // create a new session for the user
-        final var auth = userService.createAuth(username);
+            if (existingUser != null) {
+                res.status(403);
+                return new Gson().toJson(Map.of(
+                    "message", "Error: already taken"
+                ));
+            }
 
-        // respond with the auth token and username
-        return new Gson().toJson(Map.of(
-            "username", username,
-            "authToken", auth.authToken()
-        ));
+            // if the user does not exist, create them
+            userService.createUser(new UserData(username, password, email));
+
+            // create a new session for the user
+            final var auth = userService.createAuth(username);
+
+            // respond with the auth token and username
+            return new Gson().toJson(Map.of(
+                "username", username,
+                "authToken", auth.authToken()
+            ));
+        } catch(Exception e) {
+            res.status(500);
+            return new Gson().toJson(Map.of(
+                "message", "Error: Internal server error"
+            ));
+        }
     }
 }
