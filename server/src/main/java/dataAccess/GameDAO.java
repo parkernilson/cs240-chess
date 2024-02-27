@@ -1,7 +1,8 @@
 package dataAccess;
 
+import chess.ChessGame;
 import model.GameData;
-// import model.UserData;
+import model.UserData;
 
 public interface GameDAO {
     public GameData getGame(int gameId);
@@ -16,5 +17,5 @@ public interface GameDAO {
     public int getMaxGameId();
 
     // public UserData[] listParticipants(int gameId);
-    // public UserData addParticipant(int gameId, UserData user);
+    public void addParticipant(int gameId, String username, ChessGame.TeamColor color) throws DataAccessException;
 }

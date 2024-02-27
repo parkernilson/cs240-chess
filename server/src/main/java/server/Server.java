@@ -13,6 +13,7 @@ import dataAccess.MemoryUserDAO;
 import model.GameData;
 import server.handlers.ClearApplicationHandler;
 import server.handlers.CreateGameHandler;
+import server.handlers.JoinGameHandler;
 import server.handlers.ListGamesHandler;
 import server.handlers.LoginHandler;
 import server.handlers.LogoutHandler;
@@ -54,10 +55,7 @@ public class Server {
         Spark.post("/game", new CreateGameHandler(gameService, userService)::handle);
 
         // Join Game
-        Spark.put("/game", (req, res) -> {
-            res.status(200);
-            return "";
-        });
+        Spark.put("/game", new JoinGameHandler(gameService, userService)::handle);
 
         Spark.awaitInitialization();
         return Spark.port();

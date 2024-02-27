@@ -2,6 +2,7 @@ package dataAccess;
 
 import java.util.HashMap;
 
+import chess.ChessGame;
 import model.GameData;
 
 public class MemoryGameDAO implements GameDAO {
@@ -28,7 +29,21 @@ public class MemoryGameDAO implements GameDAO {
         games.clear();
     }
 
+    @SuppressWarnings("null")
     public int getMaxGameId() {
         return games.keySet().stream().max(Integer::compare).orElse(0);
+    }
+
+    public void addParticipant(int gameId, String username, ChessGame.TeamColor color) throws DataAccessException {
+        final var game = games.get(gameId);
+        if (game == null) {
+            throw new DataAccessException(username + " tried to join game " + gameId + " but it does not exist");
+        }
+
+        // check if the color is taken
+
+        // add the participant to the game
+
+        // update the game with the new participant
     }
 }
