@@ -1,6 +1,7 @@
 package service;
 
 import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.AuthData;
 import model.UserData;
@@ -23,6 +24,8 @@ public class UserService {
     }
 
     public UserData createUser(UserData userData) {
+        if (userData.username() == null || userData.email() == null || userData.password() == null)
+            throw new IllegalArgumentException("Invalid user data");
         return userDAO.createUser(userData);
     }
 
@@ -34,7 +37,9 @@ public class UserService {
         return userDAO.getUser(auth.username());
     }
 
-    public AuthData createAuth(String username) {
+    public AuthData createAuth(String username) throws DataAccessException {
+        final var user = userDAO.getUser(username);
+        if (user == null) throw new DataAccessException("User not found");
         return authDAO.createAuth(username);
     }
 
@@ -49,7 +54,7 @@ public class UserService {
     public void deleteUser(String username) {
         final var auth = authDAO.getAuthByUsername(username);
         userDAO.deleteUser(username);
-        authDAO.deleteAuth(auth.authToken());
+        if (auth != null) authDAO.deleteAuth(auth.authToken());
     }
 
     public void deleteAllUsers() {

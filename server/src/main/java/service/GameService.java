@@ -21,6 +21,8 @@ public class GameService {
     }
 
     public GameData createGame(GameData gameData) {
+        if (gameData.gameID() < 0 || gameData.gameName() == null)
+            throw new IllegalArgumentException("Invalid game data");
         return gameDAO.createGame(gameData);
     }
 
@@ -34,8 +36,14 @@ public class GameService {
 
     public void addParticipant(int gameId, String username, ChessGame.TeamColor color) throws DataAccessException {
         final var game = gameDAO.getGame(gameId);
-        final var newGame = new GameData(gameId, color == ChessGame.TeamColor.WHITE ? username : game.whiteUsername(),
-                color == ChessGame.TeamColor.BLACK ? username : game.blackUsername(), game.gameName(), game.game());
+        if (game == null) throw new DataAccessException("Game not found");
+        final var newGame = new GameData(
+            gameId, 
+            color == ChessGame.TeamColor.WHITE ? username : game.whiteUsername(),
+            color == ChessGame.TeamColor.BLACK ? username : game.blackUsername(), 
+            game.gameName(), 
+            game.game()
+        );
         gameDAO.updateGame(newGame);
     }
 }
