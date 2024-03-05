@@ -1,7 +1,8 @@
 package server;
 
 import spark.*;
-
+import dataAccess.DataAccessException;
+import dataAccess.DatabaseManager;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
 import dataAccess.MemoryUserDAO;
@@ -18,10 +19,12 @@ import service.UserService;
 
 public class Server {
 
-    public int run(int desiredPort) {
+    public int run(int desiredPort) throws DataAccessException {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        DatabaseManager.createDatabase();
 
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryUserDAO userDAO = new MemoryUserDAO();
