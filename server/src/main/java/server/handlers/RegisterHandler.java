@@ -50,8 +50,10 @@ public class RegisterHandler {
                 ));
             }
 
+            var encryptedPassword = userService.encryptPassword(password);
+
             // if the user does not exist, create them
-            userService.createUser(new UserData(username, password, email));
+            userService.createUser(new UserData(username, encryptedPassword, email));
 
             // create a new session for the user
             final var auth = userService.createAuth(username);

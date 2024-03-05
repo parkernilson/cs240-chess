@@ -1,5 +1,7 @@
 package service;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
@@ -60,5 +62,10 @@ public class UserService {
     public void deleteAllUsers() {
         userDAO.deleteAllUsers();
         authDAO.deleteAllAuth();
+    }
+
+    public String encryptPassword(String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(password);
     }
 }

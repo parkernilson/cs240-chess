@@ -37,8 +37,9 @@ public class LoginHandler {
 
         try {
             final var user = userService.getUser(username);
+            var encryptedPassword = userService.encryptPassword(password);
 
-            if (user == null || !user.password().equals(password)) {
+            if (user == null || !user.password().equals(encryptedPassword)) {
                 res.status(401);
                 return new Gson().toJson(Map.of("message", "Error: unauthorized"));
             }
