@@ -1,19 +1,21 @@
 package dataAccess;
 
+import java.util.Collection;
+
 import model.GameData;
 
 public interface GameDAO {
-    public GameData getGame(int gameId);
+    public GameData getGame(int gameId) throws ResponseException;
 
-    public GameData[] listGames(String username);
+    public Collection<GameData> listGames(String username) throws ResponseException;
 
-    public GameData createGame(GameData game);
+    public GameData createGame(GameData game) throws ResponseException, DataAccessException;
 
-    public GameData updateGame(GameData game) throws DataAccessException;
+    public GameData updateGame(GameData game) throws DataAccessException, ResponseException;
 
-    public void deleteGame(int gameId);
+    public void deleteGame(int gameId) throws ResponseException, DataAccessException;
 
-    public void deleteAllGames();
+    public void deleteAllGames() throws ResponseException, DataAccessException;
 
     public int getMaxGameId();
 }

@@ -1,5 +1,6 @@
 package dataAccess;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import model.GameData;
@@ -11,8 +12,8 @@ public class MemoryGameDAO implements GameDAO {
         return games.get(gameId);
     }
 
-    public GameData[] listGames(String username) {
-        return games.values().toArray(new GameData[0]);
+    public Collection<GameData> listGames(String username) {
+        return games.values();
     }
 
     public GameData createGame(GameData game) {
