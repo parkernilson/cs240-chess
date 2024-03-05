@@ -19,12 +19,16 @@ import service.UserService;
 
 public class Server {
 
-    public int run(int desiredPort) throws DataAccessException {
+    public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
 
-        DatabaseManager.createDatabase();
+        try {
+            DatabaseManager.createDatabase();
+        } catch(DataAccessException e) {
+            System.out.println("Error creating database: " + e.getMessage());
+        }
 
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryUserDAO userDAO = new MemoryUserDAO();
