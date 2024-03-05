@@ -1,0 +1,1 @@
+docker run --name cs240-chess-mysql -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d mysql
