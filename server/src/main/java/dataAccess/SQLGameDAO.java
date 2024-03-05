@@ -42,7 +42,21 @@ public class SQLGameDAO implements GameDAO {
             """
             CREATE TABLE IF NOT EXISTS games (
               `game_id` varchar(256) NOT NULL,
-              PRIMARY KEY (`auth_token`),
+              `white_username` varchar(256) DEFAULT NULL,
+              `black_username` varchar(256) DEFAULT NULL,
+              `game_name` varchar(256) NOT NULL,
+              `game_state` varchar(256) NOT NULL,
+              PRIMARY KEY (`game_id`),
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS participants (
+              `id` int NOT NULL AUTO_INCREMENT,
+              `game_id` varchar(256) NOT NULL,
+              `username` varchar(256) NOT NULL,
+              PRIMARY KEY (`id`),
+              INDEX(username)
+              INDEX(game_id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
