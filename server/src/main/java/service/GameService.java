@@ -1,8 +1,11 @@
 package service;
 
+import java.util.Collection;
+
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
+import dataAccess.ResponseException;
 import model.GameData;
 
 public class GameService {
@@ -12,21 +15,21 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public void deleteAllGames() {
+    public void deleteAllGames() throws ResponseException, DataAccessException {
         gameDAO.deleteAllGames();
     }
 
-    public GameData[] listGames(String username) {
+    public Collection<GameData> listGames(String username) throws ResponseException {
         return gameDAO.listGames(username);
     }
 
-    public GameData createGame(GameData gameData) {
+    public GameData createGame(GameData gameData) throws ResponseException, DataAccessException {
         if (gameData.gameID() < 0 || gameData.gameName() == null)
             throw new IllegalArgumentException("Invalid game data");
         return gameDAO.createGame(gameData);
     }
 
-    public GameData getGame(int gameId) {
+    public GameData getGame(int gameId) throws ResponseException {
         return gameDAO.getGame(gameId);
     }
 
@@ -34,7 +37,7 @@ public class GameService {
         return gameDAO.getMaxGameId() + 1;
     }
 
-    public void addParticipant(int gameId, String username, ChessGame.TeamColor color) throws DataAccessException {
+    public void addParticipant(int gameId, String username, ChessGame.TeamColor color) throws DataAccessException, ResponseException {
         final var game = gameDAO.getGame(gameId);
         if (game == null) throw new DataAccessException("Game not found");
         final var newGame = new GameData(

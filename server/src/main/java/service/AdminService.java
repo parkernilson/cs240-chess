@@ -1,5 +1,8 @@
 package service;
 
+import dataAccess.DataAccessException;
+import dataAccess.ResponseException;
+
 public class AdminService {
     private UserService userService;
     private GameService gameService;
@@ -9,7 +12,7 @@ public class AdminService {
         this.gameService = gameService;
     }
 
-    public void clearApplication() {
+    public void clearApplication() throws ResponseException, DataAccessException {
         userService.deleteAllUsers();
         gameService.deleteAllGames();
     }

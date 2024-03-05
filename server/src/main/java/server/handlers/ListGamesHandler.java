@@ -1,5 +1,6 @@
 package server.handlers;
 
+import java.util.Collection;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -36,7 +37,7 @@ public class ListGamesHandler {
                 return new Gson().toJson(Map.of("message", "Error: unauthorized"));
             }
 
-            GameData[] games = gameService.listGames(user.username());
+            Collection<GameData> games = gameService.listGames(user.username());
 
             res.status(200);
             return new Gson().toJson(Map.of(

@@ -10,6 +10,7 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryUserDAO;
+import dataAccess.ResponseException;
 import dataAccess.UserDAO;
 import model.UserData;
 import service.UserService;
@@ -27,7 +28,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldGetUser() {
+    public void shouldGetUser() throws ResponseException, DataAccessException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -41,14 +42,14 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldGetNullUserWhenNotExists() {
+    public void shouldGetNullUserWhenNotExists() throws ResponseException {
         final var username = "username";
         final var user = userService.getUser(username);
         assertEquals(null, user);
     }
 
     @Test
-    public void shouldGetAuth() throws DataAccessException {
+    public void shouldGetAuth() throws DataAccessException, ResponseException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -65,14 +66,14 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldGetNullAuthWhenNotExists() {
+    public void shouldGetNullAuthWhenNotExists() throws ResponseException {
         final var authToken = "authToken";
         final var authResult = userService.getAuth(authToken);
         assertEquals(null, authResult);
     }
 
     @Test
-    public void shouldCreatUser() {
+    public void shouldCreatUser() throws ResponseException, DataAccessException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -98,7 +99,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldGetUserByAuthToken() throws DataAccessException {
+    public void shouldGetUserByAuthToken() throws DataAccessException, ResponseException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -114,14 +115,14 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldGetNullUserByAuthTokenWhenNotExists() {
+    public void shouldGetNullUserByAuthTokenWhenNotExists() throws ResponseException {
         final var authToken = "authToken";
         final var userResult = userService.getByAuthToken(authToken);
         assertEquals(null, userResult);
     }
 
     @Test
-    public void shouldCreateAuth() throws DataAccessException {
+    public void shouldCreateAuth() throws DataAccessException, ResponseException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -145,7 +146,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldDeleteAuth() throws DataAccessException {
+    public void shouldDeleteAuth() throws DataAccessException, ResponseException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -163,13 +164,13 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldNotThrowWhenAuthTokenDoesNotExist() {
+    public void shouldNotThrowWhenAuthTokenDoesNotExist() throws ResponseException, DataAccessException {
         final var authToken = "authToken";
         userService.deleteAuth(authToken);
     }
 
     @Test
-    public void shouldGetAuthByUsername() throws DataAccessException {
+    public void shouldGetAuthByUsername() throws DataAccessException, ResponseException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -185,14 +186,14 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldGetNullWhenNoAuthByUsername() {
+    public void shouldGetNullWhenNoAuthByUsername() throws ResponseException {
         final var username = "username";
         final var authResult = userService.getAuthByUsername(username);
         assertEquals(null, authResult);
     }
 
     @Test
-    public void shouldDeleteUser() {
+    public void shouldDeleteUser() throws ResponseException, DataAccessException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -208,13 +209,13 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldNotThrowWhenUserDoesNotExist() {  
+    public void shouldNotThrowWhenUserDoesNotExist() throws ResponseException, DataAccessException {  
         final var username = "username";
         userService.deleteUser(username);
     }
 
     @Test
-    public void shouldDeleteAllUsers() {
+    public void shouldDeleteAllUsers() throws ResponseException, DataAccessException {
         final var username = "username";
         final var email = "email";
         final var password = "password";
@@ -230,7 +231,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void shouldNotThrowWhenNoUsers() {
+    public void shouldNotThrowWhenNoUsers() throws ResponseException, DataAccessException {
         userService.deleteAllUsers();
     }
 

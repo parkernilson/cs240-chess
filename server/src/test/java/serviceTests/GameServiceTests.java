@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryGameDAO;
+import dataAccess.ResponseException;
 import model.GameData;
 import service.GameService;
 
@@ -23,7 +24,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void shouldListGames() {
+    void shouldListGames() throws ResponseException, DataAccessException {
         final int gameID = 1;
         final String gameName = "gameName";
         final GameData game1 = new GameData(gameID, null, null, gameName, new ChessGame());
@@ -39,20 +40,20 @@ public class GameServiceTests {
 
         final var games = gameService.listGames(username);
 
-        assertEquals(2, games.length);
+        assertEquals(2, games.size());
     }
 
     @Test
-    void shouldListEmptyGames() {
+    void shouldListEmptyGames() throws ResponseException {
         final String username = "username";
 
         final var games = gameService.listGames(username);
 
-        assertEquals(0, games.length);
+        assertEquals(0, games.size());
     }
 
     @Test 
-    void shouldDeleteAllGames() {
+    void shouldDeleteAllGames() throws ResponseException, DataAccessException {
         final int gameID = 1;
         final String gameName = "gameName";
         final GameData game1 = new GameData(gameID, null, null, gameName, new ChessGame());
@@ -63,20 +64,20 @@ public class GameServiceTests {
 
         final var games = gameService.listGames(null);
 
-        assertEquals(0, games.length);
+        assertEquals(0, games.size());
     }
 
     @Test
-    void shouldDeleteAllGamesEvenWhenEmpty() {
+    void shouldDeleteAllGamesEvenWhenEmpty() throws ResponseException, DataAccessException {
         gameService.deleteAllGames();
 
         final var games = gameService.listGames(null);
 
-        assertEquals(0, games.length);
+        assertEquals(0, games.size());
     }
 
     @Test
-    void shouldCreateGame() {
+    void shouldCreateGame() throws ResponseException, DataAccessException {
         final int gameID = 1;
         final String gameName = "gameName";
         final GameData game1 = new GameData(gameID, null, null, gameName, new ChessGame());
@@ -100,7 +101,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void shouldGetGame() {
+    void shouldGetGame() throws ResponseException, DataAccessException {
         final int gameID = 1;
         final String gameName = "gameName";
         final GameData game1 = new GameData(gameID, null, null, gameName, new ChessGame());
@@ -113,7 +114,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void shouldReturnNullWhenGameNotFound() {
+    void shouldReturnNullWhenGameNotFound() throws ResponseException {
         final int gameID = 1;
 
         final var gameResult = gameService.getGame(gameID);
@@ -122,7 +123,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void shouldGetNextGameId() {
+    void shouldGetNextGameId() throws ResponseException, DataAccessException {
         final int gameID = 1;
         final String gameName = "gameName";
         final GameData game1 = new GameData(gameID, null, null, gameName, new ChessGame());
@@ -141,7 +142,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void shouldAddParticipant() throws DataAccessException {
+    void shouldAddParticipant() throws DataAccessException, ResponseException {
         final int gameID = 1;
         final String gameName = "gameName";
         final GameData game1 = new GameData(gameID, null, null, gameName, new ChessGame());

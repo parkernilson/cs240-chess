@@ -10,6 +10,7 @@ import dataAccess.DataAccessException;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
 import dataAccess.MemoryUserDAO;
+import dataAccess.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -37,7 +38,7 @@ public class AdminServiceTests {
     }
 
     @Test
-    public void shouldClearApplication() throws DataAccessException {
+    public void shouldClearApplication() throws DataAccessException, ResponseException {
         final String username = "username";
         final String password = "password";
         final String email = "email";
