@@ -21,7 +21,7 @@ public class SQLAuthDAO extends SQLDAO implements AuthDAO {
                     """, AUTH_TABLE)
     };
 
-    SQLAuthDAO() throws ResponseException, DataAccessException {
+    public SQLAuthDAO() throws ResponseException, DataAccessException {
         configureDatabase(createStatements);
     }
 

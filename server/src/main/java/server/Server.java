@@ -1,11 +1,16 @@
 package server;
 
 import spark.*;
-import dataAccess.DataAccessException;
+import dataAccess.AuthDAO;
 import dataAccess.DatabaseManager;
+import dataAccess.GameDAO;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
 import dataAccess.MemoryUserDAO;
+import dataAccess.SQLAuthDAO;
+import dataAccess.SQLGameDAO;
+import dataAccess.SQLUserDAO;
+import dataAccess.UserDAO;
 import server.handlers.ClearApplicationHandler;
 import server.handlers.CreateGameHandler;
 import server.handlers.JoinGameHandler;
@@ -24,15 +29,23 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        AuthDAO authDAO;
+        UserDAO userDAO;
+        GameDAO gameDAO;
+
         try {
             DatabaseManager.createDatabase();
-        } catch(DataAccessException e) {
-            System.out.println("Error creating database: " + e.getMessage());
+            authDAO = new SQLAuthDAO();
+            userDAO = new SQLUserDAO();
+            gameDAO = new SQLGameDAO();
+        } catch(Exception e) {
+            System.out.println("Failed to connect to SQL database. Using memory database instead.");
+            e.printStackTrace();
+            authDAO = new MemoryAuthDAO();
+            userDAO = new MemoryUserDAO();
+            gameDAO = new MemoryGameDAO();
         }
 
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO);
         AdminService adminService = new AdminService(userService, gameService);

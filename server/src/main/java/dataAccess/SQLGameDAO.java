@@ -37,7 +37,7 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
                     """, PARTICIPANTS_TABLE)
     };
 
-    SQLGameDAO() throws ResponseException, DataAccessException {
+    public SQLGameDAO() throws ResponseException, DataAccessException {
         configureDatabase(createStatements);
     }
 

@@ -22,7 +22,7 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
                     """, USERS_TABLE)
     };
 
-    SQLUserDAO() throws ResponseException, DataAccessException {
+    public SQLUserDAO() throws ResponseException, DataAccessException {
         configureDatabase(createStatements);
     }
 
