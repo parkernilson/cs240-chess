@@ -1,55 +1,68 @@
 package dataAccess;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import model.UserData;
 
-public class SQLUserDAO implements UserDAO {
+public class SQLUserDAO extends SQLDAO implements UserDAO {
 
-    SQLUserDAO() throws ResponseException, DataAccessException {
-        configureDatabase();
-    }
-    
-    public UserData getUser(String username) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
+    public static final String USERS_TABLE = "users";
 
-    public UserData createUser(UserData user) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    public void deleteUser(String username) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    public void deleteAllUsers() {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-
-    private final String[] createStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS users (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `username` varchar(256) NOT NULL,
-              `email` varchar(256) NOT NULL,
-              `password` varchar(256) NOT NULL,
-              PRIMARY KEY (`id`),
-              INDEX(username)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
+    static private final String[] createStatements = {
+            String.format("""
+                    CREATE TABLE IF NOT EXISTS %s (
+                      `id` int NOT NULL AUTO_INCREMENT,
+                      `username` varchar(256) NOT NULL,
+                      `email` varchar(256) NOT NULL,
+                      `password` varchar(256) NOT NULL,
+                      PRIMARY KEY (`id`),
+                      INDEX(username)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+                    """, USERS_TABLE)
     };
 
+    SQLUserDAO() throws ResponseException, DataAccessException {
+        configureDatabase(createStatements);
+    }
 
-    private void configureDatabase() throws ResponseException, DataAccessException {
+    public UserData getUser(String username) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
+            var statement = "SELECT id, json FROM pet WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
                 }
             }
-        } catch (SQLException ex) {
-            throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
+        } catch (Exception e) {
+            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
         }
+        return null;
+    }
+
+    public UserData createUser(UserData user) throws ResponseException, DataAccessException {
+        var statement = String.format("INSERT INTO %s (username, email, password) VALUES (?, ?, ?)", USERS_TABLE);
+        executeUpdate(statement, user.username(), user.email(), user.password());
+        return new UserData(user.username(), user.email(), user.password());
+    }
+
+    public void deleteUser(String username) throws ResponseException, DataAccessException {
+        var statement = String.format("DELETE FROM %s WHERE username=?", USERS_TABLE);
+        executeUpdate(statement, username);
+    }
+
+    public void deleteAllUsers() throws ResponseException, DataAccessException {
+        var statement = String.format("TRUNCATE %s", USERS_TABLE);
+        executeUpdate(statement);
+    }
+
+    private UserData readUser(ResultSet rs) throws SQLException {
+        var username = rs.getString("username");
+        var email = rs.getString("email");
+        var password = rs.getString("password");
+        return new UserData(username, password, email);
     }
 }
