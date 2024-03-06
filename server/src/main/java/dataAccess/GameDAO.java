@@ -17,5 +17,5 @@ public interface GameDAO {
 
     public void deleteAllGames() throws ResponseException, DataAccessException;
 
-    public int getMaxGameId();
+    public int getMaxGameId() throws ResponseException;
 }

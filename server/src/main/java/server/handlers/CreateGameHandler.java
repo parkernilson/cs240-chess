@@ -57,11 +57,9 @@ public class CreateGameHandler {
                     gameName,
                     new ChessGame()));
 
-            gameService.createGame(gameData);
-
             res.status(200);
             return new Gson().toJson(Map.of(
-                "gameID", gameId
+                "gameID", gameData.gameID()
             ));
         } catch(Exception e) {
             res.status(500);

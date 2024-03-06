@@ -135,7 +135,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void shouldGet1AsFirstGameId() {
+    void shouldGet1AsFirstGameId() throws ResponseException {
         final var nextGameId = gameService.getNextGameId();
 
         assertEquals(1, nextGameId);

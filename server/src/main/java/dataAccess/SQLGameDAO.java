@@ -23,6 +23,7 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
                         `game_name` varchar(256) NOT NULL,
                         `game_state` varchar(256) NOT NULL,
                         PRIMARY KEY (`game_id`),
+                        INDEX(game_name)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
                     """, GAMES_TABLE),
             String.format("""
@@ -31,7 +32,7 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
                         `game_id` varchar(256) NOT NULL,
                         `username` varchar(256) NOT NULL,
                         PRIMARY KEY (`id`),
-                        INDEX(username)
+                        INDEX(username),
                         INDEX(game_id)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
                     """, PARTICIPANTS_TABLE)
@@ -83,9 +84,9 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
         executeUpdate(statement, game.gameID(), game.gameName(), game.whiteUsername(), game.blackUsername(), gameState);
         return new GameData(
                 game.gameID(),
-                game.gameName(),
                 game.whiteUsername(),
                 game.blackUsername(),
+                game.gameName(),
                 game.game()
         );
     }
@@ -115,7 +116,20 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
         executeUpdate(statement);
     }
 
-    public int getMaxGameId() {
+    public int getMaxGameId() throws ResponseException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = String.format("SELECT MAX(game_id) FROM %s", GAMES_TABLE);
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
+        }
+
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

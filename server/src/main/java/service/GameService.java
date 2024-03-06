@@ -33,7 +33,7 @@ public class GameService {
         return gameDAO.getGame(gameId);
     }
 
-    public int getNextGameId() {
+    public int getNextGameId() throws ResponseException {
         return gameDAO.getMaxGameId() + 1;
     }
 

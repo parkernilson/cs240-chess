@@ -28,7 +28,7 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
 
     public UserData getUser(String username) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT id, json FROM pet WHERE id=?";
+            var statement = String.format("SELECT username, email, password FROM %s WHERE username=?", USERS_TABLE);
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {

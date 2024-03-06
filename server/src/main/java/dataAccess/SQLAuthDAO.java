@@ -27,7 +27,7 @@ public class SQLAuthDAO extends SQLDAO implements AuthDAO {
 
     public AuthData getAuth(String authToken) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = String.format("SELECT id, json FROM %s WHERE auth_token=?", AUTH_TABLE);
+            var statement = String.format("SELECT auth_token, username FROM %s WHERE auth_token=?", AUTH_TABLE);
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
@@ -44,7 +44,7 @@ public class SQLAuthDAO extends SQLDAO implements AuthDAO {
 
     public AuthData getAuthByUsername(String username) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = String.format("SELECT id, json FROM %s WHERE username=?", AUTH_TABLE);
+            var statement = String.format("SELECT auth_token, username FROM %s WHERE username=?", AUTH_TABLE);
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
@@ -61,8 +61,9 @@ public class SQLAuthDAO extends SQLDAO implements AuthDAO {
 
     /**
      * Create an auth for the given user
-     * @throws DataAccessException 
-     * @throws ResponseException 
+     * 
+     * @throws DataAccessException
+     * @throws ResponseException
      */
     public AuthData createAuth(String username) throws ResponseException, DataAccessException {
         String authToken = TokenGenerator.generateToken();
