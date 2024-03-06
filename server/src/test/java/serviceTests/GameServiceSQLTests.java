@@ -7,20 +7,40 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import chess.ChessGame;
+import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
-import dataAccess.SQLGameDAO;
+import dataAccess.DatabaseManager;
+import dataAccess.GameDAO;
 import dataAccess.ResponseException;
+import dataAccess.SQLAuthDAO;
+import dataAccess.SQLGameDAO;
+import dataAccess.SQLUserDAO;
+import dataAccess.UserDAO;
 import model.GameData;
+import service.AdminService;
 import service.GameService;
+import service.UserService;
 
 public class GameServiceSQLTests {
-    private static SQLGameDAO gameDAO;
+    private static AuthDAO authDAO;
+    private static UserDAO userDAO;
+    private static GameDAO gameDAO;
+    private static UserService userService;
     private static GameService gameService;
+    private static AdminService adminService;
 
     @BeforeEach
     public void beforeEach() throws ResponseException, DataAccessException {
+        DatabaseManager.createDatabase();
+
+        authDAO = new SQLAuthDAO();
+        userDAO = new SQLUserDAO();
         gameDAO = new SQLGameDAO();
+        userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO);
+        adminService = new AdminService(userService, gameService);
+
+        adminService.clearApplication();
     }
 
     @Test
