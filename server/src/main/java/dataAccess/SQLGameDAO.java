@@ -44,7 +44,7 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
 
     public GameData getGame(int gameId) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = String.format("SELECT id, json FROM %s WHERE game_id=?", GAMES_TABLE);
+            var statement = String.format("SELECT * FROM %s WHERE game_id=?", GAMES_TABLE);
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameId);
                 try (var rs = ps.executeQuery()) {
@@ -142,9 +142,9 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
         var chessGameState = new Gson().fromJson(gameState, ChessGame.class);
         return new GameData(
                 gameId,
-                gameName,
                 whiteUsername,
                 blackUsername,
+                gameName,
                 chessGameState);
     }
 

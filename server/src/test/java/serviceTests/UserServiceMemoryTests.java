@@ -15,7 +15,7 @@ import dataAccess.UserDAO;
 import model.UserData;
 import service.UserService;
 
-public class UserServiceTests {
+public class UserServiceMemoryTests {
     AuthDAO authDAO;
     UserDAO userDAO;
     UserService userService;

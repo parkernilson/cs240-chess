@@ -8,18 +8,18 @@ import org.junit.jupiter.api.Test;
 
 import chess.ChessGame;
 import dataAccess.DataAccessException;
-import dataAccess.MemoryGameDAO;
+import dataAccess.SQLGameDAO;
 import dataAccess.ResponseException;
 import model.GameData;
 import service.GameService;
 
-public class GameServiceTests {
-    private static MemoryGameDAO gameDAO;
+public class GameServiceSQLTests {
+    private static SQLGameDAO gameDAO;
     private static GameService gameService;
 
     @BeforeEach
-    public void beforeEach() {
-        gameDAO = new MemoryGameDAO();
+    public void beforeEach() throws ResponseException, DataAccessException {
+        gameDAO = new SQLGameDAO();
         gameService = new GameService(gameDAO);
     }
 

@@ -7,10 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import chess.ChessGame;
 import dataAccess.DataAccessException;
-import dataAccess.MemoryAuthDAO;
-import dataAccess.MemoryGameDAO;
-import dataAccess.MemoryUserDAO;
+import dataAccess.DatabaseManager;
 import dataAccess.ResponseException;
+import dataAccess.SQLAuthDAO;
+import dataAccess.SQLGameDAO;
+import dataAccess.SQLUserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -18,23 +19,27 @@ import service.AdminService;
 import service.GameService;
 import service.UserService;
 
-public class AdminServiceTests {
+public class AdminServiceMemoryTests {
 
-    private static MemoryAuthDAO authDAO;
-    private static MemoryUserDAO userDAO;
-    private static MemoryGameDAO gameDAO;
+    private static SQLAuthDAO authDAO;
+    private static SQLUserDAO userDAO;
+    private static SQLGameDAO gameDAO;
     private static UserService userService;
     private static GameService gameService;
     private static AdminService adminService;
 
     @BeforeEach
-    public void beforeEach() {
-        authDAO = new MemoryAuthDAO();
-        userDAO = new MemoryUserDAO();
-        gameDAO = new MemoryGameDAO();
+    public void beforeEach() throws ResponseException, DataAccessException {
+        DatabaseManager.createDatabase();
+
+        authDAO = new SQLAuthDAO();
+        userDAO = new SQLUserDAO();
+        gameDAO = new SQLGameDAO();
         userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO);
         adminService = new AdminService(userService, gameService);
+
+        adminService.clearApplication();
     }
 
     @Test
