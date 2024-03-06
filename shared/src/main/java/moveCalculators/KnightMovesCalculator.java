@@ -1,11 +1,17 @@
-package chess;
+package moveCalculators;
 
 import java.util.Collection;
 import java.util.HashSet;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.PositionOutOfBoundsException;
+
 public class KnightMovesCalculator extends PieceMovesCalculator {
     
-    private static int[][] POSSIBLE_JUMPS = {
+    private static final int[][] POSSIBLE_JUMPS = {
         {1, 2},
         {2, 1},
         {2, -1},

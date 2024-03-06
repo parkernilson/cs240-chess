@@ -11,8 +11,8 @@ import java.util.Optional;
  */
 public class ChessBoard {
 
-    static int WIDTH = 8;
-    static int HEIGHT = 8;
+    public static final int WIDTH = 8;
+    public static final int HEIGHT = 8;
 
     /** Represents the pieces of this chess board. */
     HashMap<ChessPosition, ChessPiece> board;

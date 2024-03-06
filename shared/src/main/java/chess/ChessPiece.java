@@ -2,6 +2,13 @@ package chess;
 
 import java.util.Collection;
 
+import moveCalculators.BishopMovesCalculator;
+import moveCalculators.KingMovesCalculator;
+import moveCalculators.KnightMovesCalculator;
+import moveCalculators.PawnMovesCalculator;
+import moveCalculators.QueenMovesCalculator;
+import moveCalculators.RookMovesCalculator;
+
 /**
  * Represents a single chess piece
  * <p>

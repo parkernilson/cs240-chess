@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import moveCalculators.PieceMovesCalculator;
+import util.PiecePositions;
+
 /**
  * For a class that can manage a chess game, making moves on a board
  * <p>
@@ -177,10 +180,9 @@ public class ChessGame {
         final var kingRow = kingPosition.getRow();
         final var kingCol = kingPosition.getColumn();
 
-        final int FORWARD = ChessBoard.getForward(teamColor);
-        final int BACKWARD = ChessBoard.getBackward(teamColor);
-        final int RIGHT = ChessBoard.getRight(teamColor);
-        final int LEFT = ChessBoard.getLeft(teamColor);
+        final int forward = ChessBoard.getForward(teamColor);
+        final int right = ChessBoard.getRight(teamColor);
+        final int left = ChessBoard.getLeft(teamColor);
 
         // check all possible angles of attack for the other team's pieces
         // Bishop: go in diagonal directions
@@ -190,25 +192,7 @@ public class ChessGame {
         // Pawn: at the front left and front right positions
         // Knight: in the L positions (don't care about blocking pieces)
 
-        final var surroundingPositions = new ArrayList<ChessPosition>();
-        final int[][] surroundingCoords = {
-                { kingRow - 1, kingCol },
-                { kingRow - 1, kingCol + 1 },
-                { kingRow, kingCol + 1 },
-                { kingRow + 1, kingCol + 1 },
-                { kingRow + 1, kingCol },
-                { kingRow + 1, kingCol - 1 },
-                { kingRow, kingCol - 1 },
-                { kingRow - 1, kingCol - 1 }
-        };
-
-        for (int[] coord : surroundingCoords) {
-            try {
-                final var surroundingPosition = board.getNewPosition(coord[0], coord[1]);
-                surroundingPositions.add(surroundingPosition);
-            } catch (PositionOutOfBoundsException e) {
-            }
-        }
+        final var surroundingPositions = PiecePositions.getSurroundingPositions(kingRow, kingCol, board);
 
         // check for kings in the surrounding positions
         for (ChessPosition surroundingPosition : surroundingPositions) {
@@ -220,24 +204,8 @@ public class ChessGame {
         }
 
         // check for pawns in the front left and front right positions
-        try {
-            final var frontLeft = board.getNewPosition(kingRow + FORWARD, kingCol + LEFT);
-            final var frontLeftPiece = board.getPiece(frontLeft);
-            if (frontLeftPiece != null && frontLeftPiece.getTeamColor() != teamColor
-                    && frontLeftPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                return true;
-            }
-        } catch (PositionOutOfBoundsException e) {
-        }
-        try {
-            final var frontRight = board.getNewPosition(kingRow + FORWARD, kingCol + RIGHT);
-            final var frontRightPiece = board.getPiece(frontRight);
-            if (frontRightPiece != null && frontRightPiece.getTeamColor() != teamColor
-                    && frontRightPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                return true;
-            }
-        } catch (PositionOutOfBoundsException e) {
-        }
+        final var pawnCheck = PieceMovesCalculator.checkPawns(kingRow, kingCol, forward, right, left, teamColor, board);
+        if (pawnCheck) return true;
 
         final var q = new ArrayDeque<ChessPosition>(surroundingPositions);
 
@@ -279,25 +247,7 @@ public class ChessGame {
         }
 
         // check for knights
-        final var knightPositions = new ArrayList<ChessPosition>();
-        final int[][] knightCoords = {
-                { kingRow - 2, kingCol - 1 },
-                { kingRow - 2, kingCol + 1 },
-                { kingRow - 1, kingCol - 2 },
-                { kingRow - 1, kingCol + 2 },
-                { kingRow + 1, kingCol - 2 },
-                { kingRow + 1, kingCol + 2 },
-                { kingRow + 2, kingCol - 1 },
-                { kingRow + 2, kingCol + 1 }
-        };
-
-        for (int[] coord : knightCoords) {
-            try {
-                final var knightPosition = board.getNewPosition(coord[0], coord[1]);
-                knightPositions.add(knightPosition);
-            } catch (PositionOutOfBoundsException e) {
-            }
-        }
+        final var knightPositions = PiecePositions.getSurroundingKnightPositions(kingRow, kingCol, board);
 
         for (ChessPosition knightPosition : knightPositions) {
             final var knightPiece = board.getPiece(knightPosition);
@@ -436,5 +386,4 @@ public class ChessGame {
         return true;
     }
 
-    
 }
