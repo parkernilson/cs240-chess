@@ -407,4 +407,34 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return this.board;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((turnTeam == null) ? 0 : turnTeam.hashCode());
+        result = prime * result + ((board == null) ? 0 : board.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ChessGame other = (ChessGame) obj;
+        if (turnTeam != other.turnTeam)
+            return false;
+        if (board == null) {
+            if (other.board != null)
+                return false;
+        } else if (!board.equals(other.board))
+            return false;
+        return true;
+    }
+
+    
 }
