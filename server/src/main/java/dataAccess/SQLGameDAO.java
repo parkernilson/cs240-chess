@@ -77,6 +77,13 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
     }
 
     public GameData createGame(GameData game) throws ResponseException, DataAccessException {
+        if (
+            game.gameID() < 0 
+            || game.gameName() == null 
+            || game.game() == null
+        ) {
+            throw new DataAccessException("Invalid game data");
+        }
         var statement = String.format(
                 "INSERT INTO %s (game_id, game_name, white_username, black_username, game_state) VALUES (?, ?, ?, ?, ?)",
                 GAMES_TABLE);
@@ -92,6 +99,13 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
     }
 
     public GameData updateGame(GameData game) throws DataAccessException, ResponseException {
+        if (
+            game.gameID() < 0 
+            || game.gameName() == null 
+            || game.game() == null
+        ) {
+            throw new DataAccessException("Invalid game data");
+        }
         var statement = String.format(
                 "UPDATE %s SET game_name=?, white_username=?, black_username=?, game_state=? WHERE game_id=?",
                 GAMES_TABLE);
@@ -102,8 +116,7 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
                 game.gameName(),
                 game.whiteUsername(),
                 game.blackUsername(),
-                game.game()
-        );
+                game.game());
     }
 
     public void deleteGame(int gameId) throws ResponseException, DataAccessException {

@@ -44,6 +44,9 @@ public class SQLUserDAO extends SQLDAO implements UserDAO {
     }
 
     public UserData createUser(UserData user) throws ResponseException, DataAccessException {
+        if (user.username() == null || user.email() == null || user.password() == null) {
+            throw new DataAccessException("Invalid user data");
+        }
         var statement = String.format("INSERT INTO %s (username, email, password) VALUES (?, ?, ?)", USERS_TABLE);
         executeUpdate(statement, user.username(), user.email(), user.password());
         return new UserData(user.username(), user.email(), user.password());

@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import model.AuthData;
-import util.TokenGenerator;
 
 public class SQLAuthDAO extends SQLDAO implements AuthDAO {
 
@@ -65,8 +64,10 @@ public class SQLAuthDAO extends SQLDAO implements AuthDAO {
      * @throws DataAccessException
      * @throws ResponseException
      */
-    public AuthData createAuth(String username) throws ResponseException, DataAccessException {
-        String authToken = TokenGenerator.generateToken();
+    public AuthData createAuth(String username, String authToken) throws ResponseException, DataAccessException {
+        if (!(username instanceof String && authToken instanceof String)) {
+            throw new DataAccessException("Invalid input");
+        }
         var statement = String.format("INSERT INTO %s (auth_token, username) VALUES (?, ?)", AUTH_TABLE);
         executeUpdate(statement, authToken, username);
         return new AuthData(authToken, username);

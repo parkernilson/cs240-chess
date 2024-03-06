@@ -8,6 +8,7 @@ import dataAccess.ResponseException;
 import dataAccess.UserDAO;
 import model.AuthData;
 import model.UserData;
+import util.TokenGenerator;
 
 public class UserService {
     private UserDAO userDAO;
@@ -43,7 +44,8 @@ public class UserService {
     public AuthData createAuth(String username) throws DataAccessException, ResponseException {
         final var user = userDAO.getUser(username);
         if (user == null) throw new DataAccessException("User not found");
-        return authDAO.createAuth(username);
+        String authToken = TokenGenerator.generateToken();
+        return authDAO.createAuth(username, authToken);
     }
 
     public void deleteAuth(String authToken) throws ResponseException, DataAccessException {
