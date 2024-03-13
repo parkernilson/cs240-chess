@@ -12,9 +12,6 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("\uD83D\uDC36 Welcome to the pet store. Sign in to start.");
-        System.out.print(client.help());
-
         try (Scanner scanner = new Scanner(System.in)) {
             var result = "";
             while (!result.equals("quit")) {
@@ -34,7 +31,15 @@ public class Repl {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET + ">>> " + GREEN);
+        String stateString = client.getState() == State.SIGNEDIN ? "LOGGED IN" : "LOGGED OUT";
+        System.out.print(
+            "\n" 
+            + RESET 
+            + LIGHT_GREY
+            + "[" + BLUE + stateString + LIGHT_GREY + "] "
+            + ">>> " 
+            + MAGENTA
+        );
     }
 
 }
