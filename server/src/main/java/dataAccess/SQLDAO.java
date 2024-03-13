@@ -5,6 +5,8 @@ import static java.sql.Types.NULL;
 
 import java.sql.SQLException;
 
+import exceptions.ResponseException;
+
 public class SQLDAO {
     
     protected int executeUpdate(String statement, Object... params) throws ResponseException, DataAccessException {

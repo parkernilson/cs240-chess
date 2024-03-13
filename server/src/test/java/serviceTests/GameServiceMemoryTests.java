@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryGameDAO;
-import dataAccess.ResponseException;
+import exceptions.ResponseException;
 import model.GameData;
 import service.GameService;
 

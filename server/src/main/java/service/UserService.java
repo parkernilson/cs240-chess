@@ -4,8 +4,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
-import dataAccess.ResponseException;
 import dataAccess.UserDAO;
+import exceptions.ResponseException;
 import model.AuthData;
 import model.UserData;
 import util.TokenGenerator;

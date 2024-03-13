@@ -5,7 +5,7 @@ import java.util.Collection;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
-import dataAccess.ResponseException;
+import exceptions.ResponseException;
 import model.GameData;
 
 public class GameService {

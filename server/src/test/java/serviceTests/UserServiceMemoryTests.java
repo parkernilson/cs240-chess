@@ -10,8 +10,8 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryUserDAO;
-import dataAccess.ResponseException;
 import dataAccess.UserDAO;
+import exceptions.ResponseException;
 import model.UserData;
 import service.UserService;
 

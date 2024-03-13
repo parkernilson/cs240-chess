@@ -3,6 +3,7 @@ package dataAccess;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import exceptions.ResponseException;
 import model.UserData;
 
 public class SQLUserDAO extends SQLDAO implements UserDAO {

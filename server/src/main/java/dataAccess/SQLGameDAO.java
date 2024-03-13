@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 
 import chess.ChessGame;
+import exceptions.ResponseException;
 import model.GameData;
 
 public class SQLGameDAO extends SQLDAO implements GameDAO {
