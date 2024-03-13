@@ -3,12 +3,15 @@ package client;
 import java.util.Arrays;
 
 import exceptions.ResponseException;
+import server.ServerFacade;
 import ui.Color;
 
 public class ChessClient {
     private State state = State.SIGNEDOUT;
+    private ServerFacade server;
 
     public ChessClient(String serverUrl) {
+        this.server = new ServerFacade(serverUrl);
     }
 
     public State getState() {
@@ -20,9 +23,19 @@ public class ChessClient {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
+            case "login" -> login(params[0], params[1]);
             case "quit" -> "quit";
             default -> help();
         };
+    }
+
+    public String login(String username, String password) {
+        try {
+            this.server.login(username, password);
+            return "Logging in...";
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
     }
 
     public String help() {
