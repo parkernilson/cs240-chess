@@ -2,11 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import exceptions.ResponseException;
-import model.GameData;
 
 import java.io.*;
 import java.net.*;
-import java.util.Collection;
 
 import server.model.*;
 
@@ -41,6 +39,11 @@ public class ServerFacade {
     public ListGamesResponse listGames() throws ResponseException {
         var path = "/game";
         return this.makeRequest("GET", path, null, ListGamesResponse.class);
+    }
+
+    public void joinGame(JoinGameRequest joinGameRequest) throws ResponseException {
+        var path = "/game";
+        this.makeRequest("PUT", path, joinGameRequest, null);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {

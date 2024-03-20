@@ -5,6 +5,7 @@ import java.util.Arrays;
 import exceptions.ResponseException;
 import server.ServerFacade;
 import server.model.CreateGameRequest;
+import server.model.JoinGameRequest;
 import server.model.LoginRequest;
 import server.model.RegisterRequest;
 import ui.Color;
@@ -31,6 +32,8 @@ public class ChessClient {
             case "logout" -> logout();
             case "create" -> createGame(new CreateGameRequest(params[0]));
             case "list" -> listGames();
+            case "join" -> joinGame(new JoinGameRequest(params[1], Integer.parseInt(params[0])));
+            case "observe" -> joinGame(new JoinGameRequest(null, Integer.parseInt(params[0])));
             case "quit" -> "quit";
             default -> help();
         };
@@ -80,6 +83,16 @@ public class ChessClient {
             var response = this.server.listGames();
             // TODO: implement this
             return response.games().toString();
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
+    }
+
+    public String joinGame(JoinGameRequest request) {
+        try {
+            assertSignedIn();
+            this.server.joinGame(request);
+            return "Joining game...";
         } catch (ResponseException e) {
             return e.getMessage();
         }
