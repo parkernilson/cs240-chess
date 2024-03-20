@@ -18,14 +18,14 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public void login(LoginRequest loginRequest) throws ResponseException {
+    public LoginResponse login(LoginRequest loginRequest) throws ResponseException {
         var path = "/login";
-        this.makeRequest("POST", path, loginRequest, null);
+        return this.makeRequest("POST", path, loginRequest, LoginResponse.class);
     }
 
-    public void register(RegisterRequest registerRequest) throws ResponseException {
+    public RegisterResponse register(RegisterRequest registerRequest) throws ResponseException {
         var path = "/session";
-        this.makeRequest("POST", path, registerRequest, RegisterResponse.class);
+        return this.makeRequest("POST", path, registerRequest, RegisterResponse.class);
     }
 
     public void logout() throws ResponseException {
@@ -33,10 +33,14 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null);
     }
 
-    public Collection<GameData> listGames() throws ResponseException {
+    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws ResponseException {
         var path = "/game";
-        var response = this.makeRequest("GET", path, null, ListGamesResponse.class);
-        return response.games();
+        return this.makeRequest("POST", path, createGameRequest, CreateGameResponse.class);
+    }
+
+    public ListGamesResponse listGames() throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("GET", path, null, ListGamesResponse.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {

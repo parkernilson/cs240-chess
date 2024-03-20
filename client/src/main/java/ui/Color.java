@@ -28,10 +28,10 @@ public class Color {
         Map.entry("{BG_WHITE} ", BG_WHITE)
     );
     
-    public static String format(String str) {
+    public static String format(String str, Object... args) {
         for (Entry<String, String> entry : colorCodes.entrySet()) {
             str = str.replace(entry.getKey(), entry.getValue());
         }
-        return str;
+        return String.format(str, args);
     }
 }

@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import exceptions.ResponseException;
 import server.ServerFacade;
+import server.model.CreateGameRequest;
 import server.model.LoginRequest;
 import server.model.RegisterRequest;
 import ui.Color;
@@ -28,6 +29,7 @@ public class ChessClient {
             case "login" -> login(new LoginRequest(params[0], params[1]));
             case "register" -> register(new RegisterRequest(params[0], params[1], params[2]));
             case "logout" -> logout();
+            case "create" -> createGame(new CreateGameRequest(params[0]));
             case "list" -> listGames();
             case "quit" -> "quit";
             default -> help();
@@ -62,12 +64,22 @@ public class ChessClient {
         }
     }
 
+    public String createGame(CreateGameRequest request) {
+        try {
+            assertSignedIn();
+            var response = this.server.createGame(request);
+            return Color.format("Created game with id: {GREEN}%d", response.gameID());
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
+    }
+
     public String listGames() {
         try {
             assertSignedIn();
-            var games = this.server.listGames();
+            var response = this.server.listGames();
             // TODO: implement this
-            return games.toString();
+            return response.games().toString();
         } catch (ResponseException e) {
             return e.getMessage();
         }
