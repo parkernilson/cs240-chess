@@ -28,6 +28,7 @@ public class ChessClient {
             case "login" -> login(new LoginRequest(params[0], params[1]));
             case "register" -> register(new RegisterRequest(params[0], params[1], params[2]));
             case "logout" -> logout();
+            case "list-games" -> listGames();
             case "quit" -> "quit";
             default -> help();
         };
@@ -61,15 +62,27 @@ public class ChessClient {
         }
     }
 
+    public String listGames() {
+        try {
+            assertSignedIn();
+            var games = this.server.listGames();
+            // TODO: implement this
+            return games.toString();
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
+    }
+
     public String help() {
         if (state == State.SIGNEDIN) {
             return Color.format("""
-                    {LIGHT_GREY} - {BLUE} help
-                    {LIGHT_GREY} - {BLUE} quit
+                    {LIGHT_GREY} - {BLUE} create <NAME> {LIGHT_GREY} - a new game
+                    {LIGHT_GREY} - {BLUE} list {LIGHT_GREY} - available games
+                    {LIGHT_GREY} - {BLUE} join <ID> [WHITE|BLACK|<empty>] {LIGHT_GREY} - a game
+                    {LIGHT_GREY} - {BLUE} observe <ID> {LIGHT_GREY} - a game
                     {LIGHT_GREY} - {BLUE} logout
-                    {LIGHT_GREY} - {BLUE} create-game {LIGHT_GREY} <game-name>
-                    {LIGHT_GREY} - {BLUE} join-game {LIGHT_GREY} <game-id>
-                    {LIGHT_GREY} - {BLUE} join-observer
+                    {LIGHT_GREY} - {BLUE} quit
+                    {LIGHT_GREY} - {BLUE} help
                     """);
         } else if (state == State.GAMEPLAY) {
             return Color.format("""
@@ -77,10 +90,10 @@ public class ChessClient {
                     """);
         } else {
             return Color.format("""
-                    {LIGHT_GREY} - {BLUE} help
-                    {LIGHT_GREY} - {BLUE} quit
-                    {LIGHT_GREY} - {BLUE} login {LIGHT_GREY} <username> <password>
                     {LIGHT_GREY} - {BLUE} register {LIGHT_GREY} <username> <password> <email>
+                    {LIGHT_GREY} - {BLUE} login {LIGHT_GREY} <username> <password>
+                    {LIGHT_GREY} - {BLUE} quit
+                    {LIGHT_GREY} - {BLUE} help
                     """);
         }
     }

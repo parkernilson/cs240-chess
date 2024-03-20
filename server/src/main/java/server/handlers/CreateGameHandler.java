@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 
 import chess.ChessGame;
 import model.GameData;
+import server.model.CreateGameRequest;
 import service.GameService;
 import service.UserService;
 import spark.Request;
@@ -14,8 +15,6 @@ import spark.Response;
 public class CreateGameHandler {
     private GameService gameService;
     private UserService userService;
-
-    public static record RequestBody(String gameName) {}
 
     public CreateGameHandler(GameService gameService, UserService userService) {
         this.gameService = gameService;
@@ -26,7 +25,7 @@ public class CreateGameHandler {
         String gameName;
 
         try {
-            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            final var requestBody = new Gson().fromJson(req.body(), CreateGameRequest.class);
             gameName = requestBody.gameName();
             if (gameName == null) {
                 throw new Exception();

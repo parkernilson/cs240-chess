@@ -6,6 +6,7 @@ import model.GameData;
 
 import java.io.*;
 import java.net.*;
+import java.util.Collection;
 
 import server.model.*;
 
@@ -32,11 +33,9 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null);
     }
 
-    public GameData[] listGames() throws ResponseException {
-        var path = "/games";
-        record ListGameResponse(GameData[] games) {
-        }
-        var response = this.makeRequest("GET", path, null, ListGameResponse.class);
+    public Collection<GameData> listGames() throws ResponseException {
+        var path = "/game";
+        var response = this.makeRequest("GET", path, null, ListGamesResponse.class);
         return response.games();
     }
 
