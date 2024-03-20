@@ -27,6 +27,7 @@ public class ChessClient {
         return switch (cmd) {
             case "login" -> login(new LoginRequest(params[0], params[1]));
             case "register" -> register(new RegisterRequest(params[0], params[1], params[2]));
+            case "logout" -> logout();
             case "quit" -> "quit";
             default -> help();
         };
@@ -45,6 +46,16 @@ public class ChessClient {
         try {
             this.server.register(registerRequest);
             return "Registering...";
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
+    }
+
+    public String logout() {
+        try {
+            assertSignedIn();
+            this.server.logout();
+            return "Logging out...";
         } catch (ResponseException e) {
             return e.getMessage();
         }

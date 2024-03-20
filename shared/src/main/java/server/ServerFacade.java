@@ -23,8 +23,13 @@ public class ServerFacade {
     }
 
     public void register(RegisterRequest registerRequest) throws ResponseException {
-        var path = "/register";
+        var path = "/session";
         this.makeRequest("POST", path, registerRequest, RegisterResponse.class);
+    }
+
+    public void logout() throws ResponseException {
+        var path = "/session";
+        this.makeRequest("DELETE", path, null, null);
     }
 
     public GameData[] listGames() throws ResponseException {
