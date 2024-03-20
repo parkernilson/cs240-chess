@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 import model.UserData;
+import server.model.RegisterRequest;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -16,16 +17,13 @@ public class RegisterHandler {
         this.userService = userService;
     }
 
-    private static record RequestBody(String username, String password, String email) {
-    }
-
     public Object handle(Request req, Response res) {
         String username;
         String password;
         String email;
 
         try {
-            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            final var requestBody = new Gson().fromJson(req.body(), RegisterRequest.class);
             username = requestBody.username();
             password = requestBody.password();
             email = requestBody.email();

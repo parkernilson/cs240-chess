@@ -6,15 +6,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.google.gson.Gson;
 
+import server.model.LoginRequest;
 import service.UserService;
 import spark.Request;
 import spark.Response;
 
 public class LoginHandler {
     private UserService userService;
-
-    private static record RequestBody(String username, String password) {
-    }
 
     public LoginHandler(UserService userService) {
         this.userService = userService;
@@ -26,7 +24,7 @@ public class LoginHandler {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         try {
-            final var requestBody = new Gson().fromJson(req.body(), RequestBody.class);
+            final var requestBody = new Gson().fromJson(req.body(), LoginRequest.class);
             username = requestBody.username();
             password = requestBody.password();
             

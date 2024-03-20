@@ -7,6 +7,8 @@ import model.GameData;
 import java.io.*;
 import java.net.*;
 
+import server.model.*;
+
 public class ServerFacade {
 
     private final String serverUrl;
@@ -15,11 +17,14 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public void login(String username, String password) throws ResponseException {
+    public void login(LoginRequest loginRequest) throws ResponseException {
         var path = "/login";
-        record LoginRequest(String username, String password) {
-        }
-        this.makeRequest("POST", path, new LoginRequest(username, password), null);
+        this.makeRequest("POST", path, loginRequest, null);
+    }
+
+    public void register(RegisterRequest registerRequest) throws ResponseException {
+        var path = "/register";
+        this.makeRequest("POST", path, registerRequest, RegisterResponse.class);
     }
 
     public GameData[] listGames() throws ResponseException {

@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 import exceptions.ResponseException;
 import server.ServerFacade;
+import server.model.LoginRequest;
+import server.model.RegisterRequest;
 import ui.Color;
 
 public class ChessClient {
@@ -23,16 +25,26 @@ public class ChessClient {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "login" -> login(params[0], params[1]);
+            case "login" -> login(new LoginRequest(params[0], params[1]));
+            case "register" -> register(new RegisterRequest(params[0], params[1], params[2]));
             case "quit" -> "quit";
             default -> help();
         };
     }
 
-    public String login(String username, String password) {
+    public String login(LoginRequest loginRequest) {
         try {
-            this.server.login(username, password);
+            this.server.login(loginRequest);
             return "Logging in...";
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
+    }
+
+    public String register(RegisterRequest registerRequest) {
+        try {
+            this.server.register(registerRequest);
+            return "Registering...";
         } catch (ResponseException e) {
             return e.getMessage();
         }
@@ -57,7 +69,7 @@ public class ChessClient {
                     %light_grey - %blue help
                     %light_grey - %blue quit
                     %light_grey - %blue login %light_grey <username> <password>
-                    %light_grey - %blue register %light_grey <username> <password>
+                    %light_grey - %blue register %light_grey <username> <password> <email>
                     """);
         }
     }
