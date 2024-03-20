@@ -7,25 +7,25 @@ import static ui.EscapeSequences.*;
 
 public class Color {
     static Map<String, String> colorCodes = Map.ofEntries(
-        Map.entry("%black ", BLACK),
-        Map.entry("%light_grey ", LIGHT_GREY),
-        Map.entry("%dark_grey ", DARK_GREY),
-        Map.entry("%red ", RED),
-        Map.entry("%green ", GREEN),
-        Map.entry("%yellow ", YELLOW),
-        Map.entry("%blue ", BLUE),
-        Map.entry("%magenta ", MAGENTA),
-        Map.entry("%white ", WHITE),
-        Map.entry("%reset ", RESET),
-        Map.entry("%bg_black ", BG_BLACK),
-        Map.entry("%bg_light_grey ", BG_LIGHT_GREY),
-        Map.entry("%bg_dark_grey ", BG_DARK_GREY),
-        Map.entry("%bg_red ", BG_RED),
-        Map.entry("%bg_green ", BG_GREEN),
-        Map.entry("%bg_yellow ", BG_DARK_GREEN),
-        Map.entry("%bg_blue ", BG_BLUE),
-        Map.entry("%bg_magenta ", BG_MAGENTA),
-        Map.entry("%bg_white ", BG_WHITE)
+        Map.entry("{BLACK} ", BLACK),
+        Map.entry("{LIGHT_GREY} ", LIGHT_GREY),
+        Map.entry("{DARK_GREY} ", DARK_GREY),
+        Map.entry("{RED} ", RED),
+        Map.entry("{GREEN} ", GREEN),
+        Map.entry("{YELLOW} ", YELLOW),
+        Map.entry("{BLUE} ", BLUE),
+        Map.entry("{MAGENTA} ", MAGENTA),
+        Map.entry("{WHITE} ", WHITE),
+        Map.entry("{RESET} ", RESET),
+        Map.entry("{BG_BLACK} ", BG_BLACK),
+        Map.entry("{BG_LIGHT_GREY} ", BG_LIGHT_GREY),
+        Map.entry("{BG_DARK_GREY} ", BG_DARK_GREY),
+        Map.entry("{BG_RED} ", BG_RED),
+        Map.entry("{BG_GREEN} ", BG_GREEN),
+        Map.entry("{BG_YELLOW} ", BG_DARK_GREEN),
+        Map.entry("{BG_BLUE} ", BG_BLUE),
+        Map.entry("{BG_MAGENTA} ", BG_MAGENTA),
+        Map.entry("{BG_WHITE} ", BG_WHITE)
     );
     
     public static String format(String str) {

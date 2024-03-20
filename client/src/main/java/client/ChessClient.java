@@ -1,5 +1,7 @@
 package client;
 
+import static ui.EscapeSequences.*;
+
 import java.util.Arrays;
 
 import exceptions.ResponseException;
@@ -53,23 +55,23 @@ public class ChessClient {
     public String help() {
         if (state == State.SIGNEDIN) {
             return Color.format("""
-                    %light_grey - %blue help
-                    %light_grey - %blue quit
-                    %light_grey - %blue logout
-                    %light_grey - %blue create-game %light_grey <game-name>
-                    %light_grey - %blue join-game %light_grey <game-id>
-                    %light_grey - %blue join-observer
+                    {LIGHT_GREY} - {BLUE} help
+                    {LIGHT_GREY} - {BLUE} quit
+                    {LIGHT_GREY} - {BLUE} logout
+                    {LIGHT_GREY} - {BLUE} create-game {LIGHT_GREY} <game-name>
+                    {LIGHT_GREY} - {BLUE} join-game {LIGHT_GREY} <game-id>
+                    {LIGHT_GREY} - {BLUE} join-observer
                     """);
         } else if (state == State.GAMEPLAY) {
             return Color.format("""
-                    %light_grey - %blue quit
+                    {LIGHT_GREY} - {BLUE} quit
                     """);
         } else {
             return Color.format("""
-                    %light_grey - %blue help
-                    %light_grey - %blue quit
-                    %light_grey - %blue login %light_grey <username> <password>
-                    %light_grey - %blue register %light_grey <username> <password> <email>
+                    {LIGHT_GREY} - {BLUE} help
+                    {LIGHT_GREY} - {BLUE} quit
+                    {LIGHT_GREY} - {BLUE} login {LIGHT_GREY} <username> <password>
+                    {LIGHT_GREY} - {BLUE} register {LIGHT_GREY} <username> <password> <email>
                     """);
         }
     }
