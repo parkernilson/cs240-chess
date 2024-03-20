@@ -28,7 +28,7 @@ public class ChessClient {
             case "login" -> login(new LoginRequest(params[0], params[1]));
             case "register" -> register(new RegisterRequest(params[0], params[1], params[2]));
             case "logout" -> logout();
-            case "list-games" -> listGames();
+            case "list" -> listGames();
             case "quit" -> "quit";
             default -> help();
         };
