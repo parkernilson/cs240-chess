@@ -1,7 +1,5 @@
 package client;
 
-import static ui.EscapeSequences.*;
-
 import java.util.Arrays;
 
 import exceptions.ResponseException;
