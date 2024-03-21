@@ -8,6 +8,7 @@ import moveCalculators.KnightMovesCalculator;
 import moveCalculators.PawnMovesCalculator;
 import moveCalculators.QueenMovesCalculator;
 import moveCalculators.RookMovesCalculator;
+import static ui.EscapeSequences.*;
 
 /**
  * Represents a single chess piece
@@ -57,17 +58,17 @@ public class ChessPiece {
     public String getSymbol() {
         switch (type) {
             case PAWN:
-                return pieceColor == ChessGame.TeamColor.WHITE ? "P" : "p";
+                return pieceColor == ChessGame.TeamColor.WHITE ? WHITE_PAWN : BLACK_PAWN;
             case ROOK:
-                return pieceColor == ChessGame.TeamColor.WHITE ? "R" : "r";
+                return pieceColor == ChessGame.TeamColor.WHITE ? WHITE_ROOK : BLACK_ROOK;
             case KNIGHT:
-                return pieceColor == ChessGame.TeamColor.WHITE ? "N" : "n";
+                return pieceColor == ChessGame.TeamColor.WHITE ? WHITE_KNIGHT : BLACK_KNIGHT;
             case BISHOP:
-                return pieceColor == ChessGame.TeamColor.WHITE ? "B" : "b";
+                return pieceColor == ChessGame.TeamColor.WHITE ? WHITE_BISHOP : BLACK_BISHOP;
             case QUEEN:
-                return pieceColor == ChessGame.TeamColor.WHITE ? "Q" : "q";
+                return pieceColor == ChessGame.TeamColor.WHITE ? WHITE_QUEEN : BLACK_QUEEN;
             case KING:
-                return pieceColor == ChessGame.TeamColor.WHITE ? "K" : "k";
+                return pieceColor == ChessGame.TeamColor.WHITE ? WHITE_KING : BLACK_KING;
             default:
                 throw new RuntimeException(String.format("Unsupported piece type: %s", type));
         }

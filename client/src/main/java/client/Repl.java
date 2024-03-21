@@ -31,12 +31,12 @@ public class Repl {
     }
 
     private void printPrompt() {
-        String stateString = client.getState() == State.SIGNEDIN ? "LOGGED IN" : "LOGGED OUT";
+        String stateString = client.getState() == State.SIGNEDIN ? GREEN + "LOGGED IN" : BLUE + "LOGGED OUT";
         System.out.print(
             "\n" 
             + RESET 
             + LIGHT_GREY
-            + "[" + BLUE + stateString + LIGHT_GREY + "] "
+            + "[" + stateString + LIGHT_GREY + "] "
             + ">>> " 
             + MAGENTA
         );

@@ -5,24 +5,31 @@ import exceptions.ResponseException;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 
 import server.model.*;
 
 public class ServerFacade {
 
     private final String serverUrl;
+    private String authToken;
 
     public ServerFacade(String url) {
         serverUrl = url;
+        this.authToken = null;
+    }
+
+    public void setAuthToken(String userToken) {
+        this.authToken = userToken;
     }
 
     public LoginResponse login(LoginRequest loginRequest) throws ResponseException {
-        var path = "/login";
+        var path = "/session";
         return this.makeRequest("POST", path, loginRequest, LoginResponse.class);
     }
 
     public RegisterResponse register(RegisterRequest registerRequest) throws ResponseException {
-        var path = "/session";
+        var path = "/user";
         return this.makeRequest("POST", path, registerRequest, RegisterResponse.class);
     }
 
@@ -46,12 +53,26 @@ public class ServerFacade {
         this.makeRequest("PUT", path, joinGameRequest, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass)
+            throws ResponseException {
+        return makeRequest(method, path, request, responseClass, new HashMap<>());
+    }
+
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass,
+            HashMap<String, String> headers) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            for (var entry : headers.entrySet()) {
+                http.addRequestProperty(entry.getKey(), entry.getValue());
+            }
+
+            if (authToken != null) {
+                http.addRequestProperty("Authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();
@@ -61,7 +82,6 @@ public class ServerFacade {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {

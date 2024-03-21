@@ -27,6 +27,9 @@ public class JoinGameHandler {
         try {
             final var requestBody = new Gson().fromJson(req.body(), JoinGameRequest.class);
             playerColorString = requestBody.playerColor();
+            if (playerColorString != null) {
+                playerColorString = playerColorString.toUpperCase();
+            }
             gameId = requestBody.gameID();
             if (gameId < 0) {
                 throw new Exception();
