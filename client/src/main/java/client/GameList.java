@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import model.GameData;
+import ui.Color;
+import static ui.EscapeSequences.*;
 
 public class GameList {
     private ArrayList<GameData> games;
@@ -22,13 +24,13 @@ public class GameList {
 
     public String renderGameList() {
         var sb = new StringBuilder();
-        sb.append("Games:\n");
+        sb.append(Color.format("Games{LIGHT_GREY} :\n"));
         for (int i = 0; i < games.size(); i++) {
             var game = games.get(i);
-            sb.append(i + ". ");
-            sb.append(game.gameName());
-            sb.append("\nWhite: " + game.whiteUsername());
-            sb.append("\nBlack: " + game.blackUsername());
+            sb.append(BLUE + i + LIGHT_GREY + ". ");
+            sb.append(WHITE + game.gameName());
+            sb.append(LIGHT_GREY + "\nWhite: " + WHITE + game.whiteUsername());
+            sb.append(LIGHT_GREY + "\nBlack: " + WHITE + game.blackUsername());
             sb.append("\n");
         }
         return sb.toString();
