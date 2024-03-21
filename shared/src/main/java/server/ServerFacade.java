@@ -53,6 +53,11 @@ public class ServerFacade {
         this.makeRequest("PUT", path, joinGameRequest, null);
     }
 
+    public void clearApplication() throws ResponseException {
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, null);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass)
             throws ResponseException {
         return makeRequest(method, path, request, responseClass, new HashMap<>());
