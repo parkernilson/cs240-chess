@@ -2,6 +2,7 @@ package client;
 
 import java.util.Arrays;
 
+import chess.ChessGame;
 import exceptions.ResponseException;
 import server.ServerFacade;
 import server.model.CreateGameRequest;
@@ -13,9 +14,11 @@ import ui.Color;
 public class ChessClient {
     private State state = State.SIGNEDOUT;
     private ServerFacade server;
+    private GameList gameList;
 
     public ChessClient(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
+        this.gameList = null;
     }
 
     public State getState() {
@@ -32,16 +35,24 @@ public class ChessClient {
             case "logout" -> logout();
             case "create" -> createGame(new CreateGameRequest(params[0]));
             case "list" -> listGames();
-            case "join" -> joinGame(new JoinGameRequest(params[1], Integer.parseInt(params[0])));
-            case "observe" -> joinGame(new JoinGameRequest(null, Integer.parseInt(params[0])));
+            case "join" -> joinGame(Integer.parseInt(params[0]), params.length > 1 ? params[1] : null);
+            case "observe" -> joinGame(Integer.parseInt(params[0]), null);
             case "quit" -> "quit";
             default -> help();
         };
     }
 
+    public String showDefaultGame() {
+        ChessGame game = new ChessGame();
+        game.getBoard().resetBoard();
+        return ChessGameRenderer.renderGame(game);
+    }
+
     public String login(LoginRequest loginRequest) {
         try {
-            this.server.login(loginRequest);
+            final var response = this.server.login(loginRequest);
+            this.server.setAuthToken(response.authToken());
+            this.state = State.SIGNEDIN;
             return "Logging in...";
         } catch (ResponseException e) {
             return e.getMessage();
@@ -50,7 +61,9 @@ public class ChessClient {
 
     public String register(RegisterRequest registerRequest) {
         try {
-            this.server.register(registerRequest);
+            final var response = this.server.register(registerRequest);
+            this.server.setAuthToken(response.authToken());
+            this.state = State.SIGNEDIN;
             return "Registering...";
         } catch (ResponseException e) {
             return e.getMessage();
@@ -61,6 +74,8 @@ public class ChessClient {
         try {
             assertSignedIn();
             this.server.logout();
+            this.server.setAuthToken(null);
+            this.state = State.SIGNEDOUT;
             return "Logging out...";
         } catch (ResponseException e) {
             return e.getMessage();
@@ -71,7 +86,7 @@ public class ChessClient {
         try {
             assertSignedIn();
             var response = this.server.createGame(request);
-            return Color.format("Created game with id: {GREEN}%d", response.gameID());
+            return Color.format("Created game with id: {GREEN} %d", response.gameID());
         } catch (ResponseException e) {
             return e.getMessage();
         }
@@ -81,18 +96,19 @@ public class ChessClient {
         try {
             assertSignedIn();
             var response = this.server.listGames();
-            // TODO: implement this
-            return response.games().toString();
+            this.gameList = new GameList(response.games());
+            return this.gameList.renderGameList();
         } catch (ResponseException e) {
             return e.getMessage();
         }
     }
 
-    public String joinGame(JoinGameRequest request) {
+    public String joinGame(int gameNumber, String color) {
         try {
             assertSignedIn();
-            this.server.joinGame(request);
-            return "Joining game...";
+            var game = this.gameList.get(gameNumber);
+            this.server.joinGame(new JoinGameRequest(color, game.gameID()));
+            return showDefaultGame();
         } catch (ResponseException e) {
             return e.getMessage();
         }
