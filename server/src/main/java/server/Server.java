@@ -21,6 +21,7 @@ import server.handlers.RegisterHandler;
 import service.AdminService;
 import service.GameService;
 import service.UserService;
+import server.websocket.WebSocketHandler;
 
 public class Server {
 
@@ -49,6 +50,10 @@ public class Server {
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO);
         AdminService adminService = new AdminService(userService, gameService);
+
+        WebSocketHandler webSocketHandler = new WebSocketHandler();
+
+        Spark.webSocket("/connect", webSocketHandler);
 
         // Clear Application
         Spark.delete("/db", new ClearApplicationHandler(adminService)::handle);
