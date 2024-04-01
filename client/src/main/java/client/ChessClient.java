@@ -19,7 +19,7 @@ public class ChessClient implements ServerMessageObserver {
     private ServerFacade server;
     private GameList gameList;
 
-    public ChessClient(String serverUrl) {
+    public ChessClient(String serverUrl) throws ResponseException {
         this.server = new ServerFacade(serverUrl, this);
         this.gameList = null;
     }

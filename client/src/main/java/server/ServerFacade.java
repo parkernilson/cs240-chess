@@ -1,27 +1,28 @@
 package server;
 
-import com.google.gson.Gson;
 import exceptions.ResponseException;
-
-import java.io.*;
-import java.net.*;
-import java.util.HashMap;
-
-import server.model.*;
+import server.model.CreateGameRequest;
+import server.model.CreateGameResponse;
+import server.model.JoinGameRequest;
+import server.model.ListGamesResponse;
+import server.model.LoginRequest;
+import server.model.LoginResponse;
+import server.model.RegisterRequest;
+import server.model.RegisterResponse;
 import webSocketMessages.ServerMessageObserver;
 
 public class ServerFacade {
 
     private final String serverUrl;
     private String authToken;
-    private ServerMessageObserver observer;
+    private WebSocketCommunicator ws;
     private HttpCommunicator http;
 
-    public ServerFacade(String url, ServerMessageObserver observer) {
+    public ServerFacade(String url, ServerMessageObserver observer) throws ResponseException {
         serverUrl = url;
         this.authToken = null;
-        this.observer = observer;
         this.http = new HttpCommunicator(serverUrl);
+        this.ws = new WebSocketCommunicator(serverUrl, observer);
     }
 
     public void setAuthToken(String userToken) {
@@ -33,7 +34,7 @@ public class ServerFacade {
         return this.http.makeRequest("POST", authToken, path, loginRequest, LoginResponse.class);
     }
 
-    public RegisterResponse register(String authToken, RegisterRequest registerRequest) throws ResponseException {
+    public RegisterResponse register(RegisterRequest registerRequest) throws ResponseException {
         var path = "/user";
         return this.http.makeRequest("POST", authToken, path, registerRequest, RegisterResponse.class);
     }
