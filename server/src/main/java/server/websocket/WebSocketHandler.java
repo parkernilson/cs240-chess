@@ -5,6 +5,8 @@ import exceptions.ResponseException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+
+import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.serverMessages.ServerMessage.ServerMessageType;
 import webSocketMessages.userCommands.UserGameCommand.CommandType;
@@ -12,7 +14,6 @@ import webSocketMessages.userCommands.UserGameCommand;
 
 import java.io.IOException;
 import java.util.Timer;
-
 
 @WebSocket
 public class WebSocketHandler {
@@ -33,7 +34,9 @@ public class WebSocketHandler {
 
     private void joinPlayer(String authToken, Session session) throws IOException {
         connections.add(authToken, session);
-        var notification = new ServerMessage(ServerMessageType.NOTIFICATION);
+        // TODO: get the user
+        String username = "username";
+        var notification = new NotificationMessage(String.format("%s has joined the game", username));
         connections.broadcast(authToken, notification);
     }
 
