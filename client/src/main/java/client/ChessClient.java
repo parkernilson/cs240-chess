@@ -9,15 +9,18 @@ import server.model.CreateGameRequest;
 import server.model.JoinGameRequest;
 import server.model.LoginRequest;
 import server.model.RegisterRequest;
+import webSocketMessages.ServerMessageObserver;
+import webSocketMessages.serverMessages.NotificationMessage;
+import webSocketMessages.serverMessages.ServerMessage;
 import ui.Color;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageObserver {
     private State state = State.SIGNEDOUT;
     private ServerFacade server;
     private GameList gameList;
 
     public ChessClient(String serverUrl) {
-        this.server = new ServerFacade(serverUrl);
+        this.server = new ServerFacade(serverUrl, this);
         this.gameList = null;
     }
 
@@ -136,6 +139,13 @@ public class ChessClient {
                     {LIGHT_GREY} - {BLUE} quit
                     {LIGHT_GREY} - {BLUE} help
                     """);
+        }
+    }
+
+    public void notify(ServerMessage message) {
+        if (message instanceof NotificationMessage) {
+            var notificationMessage = (NotificationMessage) message;
+            System.out.println(notificationMessage.getMessage());
         }
     }
 
