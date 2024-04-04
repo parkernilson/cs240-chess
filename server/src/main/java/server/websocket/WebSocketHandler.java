@@ -134,11 +134,21 @@ public class WebSocketHandler {
 
     }
 
-    private void leave(LeaveGameCommand action, Session session) {
+    private void leave(LeaveGameCommand action, Session session) throws IOException {
+        final var authToken = action.getAuthString();
 
+        UserData user;
+        try {
+            user = userService.getUser(authToken);
+        } catch (ResponseException e) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid auth token")));
+            return;
+        }
+
+        sessionManager.removeUserFromGame(authToken);
     }
 
-    private void resign(ResignGameCommand action, Session session) {
-
+    private void resign(ResignGameCommand action, Session session) throws IOException {
+        leave(new LeaveGameCommand(action.getAuthString(), action.getGameID()), session);
     }
 }
