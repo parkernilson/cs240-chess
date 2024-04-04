@@ -51,7 +51,7 @@ public class Server {
         GameService gameService = new GameService(gameDAO);
         AdminService adminService = new AdminService(userService, gameService);
 
-        WebSocketHandler webSocketHandler = new WebSocketHandler();
+        WebSocketHandler webSocketHandler = new WebSocketHandler(userService, gameService);
 
         Spark.webSocket("/connect", webSocketHandler);
 
