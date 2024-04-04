@@ -63,6 +63,11 @@ public class ServerFacade {
         this.ws.joinGame(authToken, joinGameRequest);
     }
 
+    public void leaveGame(int gameID) throws ResponseException {
+        // Leave the game on the websocket
+        this.ws.leaveGame(authToken, gameID);
+    }
+
     public void clearApplication() throws ResponseException {
         var path = "/db";
         this.http.makeRequest("DELETE", authToken, path, null, null);

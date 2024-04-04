@@ -46,6 +46,7 @@ public class WebSocketCommunicator {
     }
 
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ResponseException {
+        // TODO: how to re open the connection after it has been closed?
         try {
             var action = new JoinGameCommand(authToken, joinGameRequest.gameID(),
                     TeamColor.valueOf(joinGameRequest.playerColor()));
