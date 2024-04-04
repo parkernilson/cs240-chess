@@ -130,7 +130,12 @@ public class ChessClient implements ServerMessageObserver {
                     """);
         } else if (state == State.GAMEPLAY) {
             return Color.format("""
-                    {LIGHT_GREY} - {BLUE} quit
+                    {LIGHT_GREY} - {BLUE} redraw {LIGHT_GREY} - the board
+                    {LIGHT_GREY} - {BLUE} leave {LIGHT_GREY} - the game
+                    {LIGHT_GREY} - {BLUE} move <FROM> <TO> {LIGHT_GREY} - a piece
+                    {LIGHT_GREY} - {BLUE} resign
+                    {LIGHT_GREY} - {BLUE} show-moves <FROM> {LIGHT_GREY} - a piece
+                    {LIGHT_GRAY} - {BLUE} help
                     """);
         } else {
             return Color.format("""
