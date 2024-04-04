@@ -54,6 +54,13 @@ public class ChessMove {
         return promotionPiece;
     }
 
+    @Override
+    public String toString() {
+        if (promotionPiece != null) {
+            return String.format("%s -> %s (promote to %s)", startPosition, endPosition, promotionPiece);
+        }
+        return String.format("%s -> %s", startPosition, endPosition);
+    }
     
     @Override
     public int hashCode() {

@@ -9,6 +9,8 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import com.google.gson.Gson;
 
+import chess.ChessGame;
+import chess.InvalidMoveException;
 import chess.ChessGame.TeamColor;
 import exceptions.ResponseException;
 import model.GameData;
@@ -21,7 +23,9 @@ import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.serverMessages.ServerMessage.ServerMessageType;
 import webSocketMessages.userCommands.JoinGameCommand;
+import webSocketMessages.userCommands.LeaveGameCommand;
 import webSocketMessages.userCommands.MakeMoveCommand;
+import webSocketMessages.userCommands.ResignGameCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 import webSocketMessages.userCommands.UserGameCommand.CommandType;
 
@@ -43,9 +47,9 @@ public class WebSocketHandler {
         switch (action.getCommandType()) {
             case CommandType.JOIN_PLAYER -> joinPlayer((JoinGameCommand) action, session);
             case CommandType.JOIN_OBSERVER -> joinPlayer((JoinGameCommand) action, session);
-            case CommandType.MAKE_MOVE -> makeMove();
-            case CommandType.LEAVE -> leave();
-            case CommandType.RESIGN -> resign();
+            case CommandType.MAKE_MOVE -> makeMove((MakeMoveCommand) action, session);
+            case CommandType.LEAVE -> leave((LeaveGameCommand) action, session);
+            case CommandType.RESIGN -> resign((ResignGameCommand) action, session);
         }
     }
 
@@ -101,21 +105,40 @@ public class WebSocketHandler {
             return;
         }
 
-        // GameData game;
-        // try {
-        //     game = gameService.getGame(gameID);
-        // } catch (ResponseException e) {
-        //     session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid game ID")));
-        //     return;
-        // }
+        final Integer gameID = sessionManager.getUserGameID(authToken);
+        if (gameID == null) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("User is not in a game")));
+            return;
+        }
+
+        GameData gameData;
+        try {
+            gameData = gameService.getGame(gameID);
+        } catch (ResponseException e) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid game ID")));
+            return;
+        }
+
+        try {
+            gameData.game().makeMove(move);
+        } catch (InvalidMoveException e) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid move")));
+            return;
+        }
+
+        final var loadGameMessage = new LoadGameMessage(gameData);
+        sessionManager.broadcast(gameID, loadGameMessage);
+        sessionManager.broadcast(gameID,
+                new NotificationMessage(String.format("%s made move %s", user.username(), move)),
+                List.of(authToken));
 
     }
 
-    private void leave() {
+    private void leave(LeaveGameCommand action, Session session) {
 
     }
 
-    private void resign() {
+    private void resign(ResignGameCommand action, Session session) {
 
     }
 }

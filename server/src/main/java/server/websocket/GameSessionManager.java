@@ -33,6 +33,10 @@ public class GameSessionManager {
         }
     }
 
+    public void broadcast(Integer gameID, Object message) {
+        broadcast(gameID, message, List.of());
+    }
+
     public void broadcast(Integer gameID, Object message, Collection<String> excludedUsers) {
         for (Connection connection : gameConnections.get(gameID)) {
             // Clean up any connections that have been closed
@@ -52,6 +56,10 @@ public class GameSessionManager {
                 connection.session().getRemote().sendStringByFuture(new Gson().toJson(message));
             }
         }
+    }
+
+    public Integer getUserGameID(String authToken) {
+        return userGames.get(authToken);
     }
 
 }

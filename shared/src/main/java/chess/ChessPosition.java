@@ -33,6 +33,11 @@ public class ChessPosition {
     }
 
     @Override
+    public String toString() {
+        return String.format("%c%d", (char) ('a' + col - 1), row);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(row, col);
     }
