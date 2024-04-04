@@ -2,6 +2,9 @@ package server;
 
 import webSocketMessages.ServerMessageObserver;
 import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.JoinGameCommand;
+import webSocketMessages.userCommands.LeaveGameCommand;
+import webSocketMessages.userCommands.UserGameCommand;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,7 +14,9 @@ import javax.websocket.*;
 
 import com.google.gson.Gson;
 
+import chess.ChessGame.TeamColor;
 import exceptions.ResponseException;
+import server.model.JoinGameRequest;
 
 public class WebSocketCommunicator {
     String url;
@@ -27,7 +32,7 @@ public class WebSocketCommunicator {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            //set message handler
+            // set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
@@ -40,27 +45,23 @@ public class WebSocketCommunicator {
         }
     }
 
-    //Endpoint requires this method, but you don't have to do anything
-    // @Override
-    // public void onOpen(Session session, EndpointConfig endpointConfig) {
-    // }
+    public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ResponseException {
+        try {
+            var action = new JoinGameCommand(authToken, joinGameRequest.gameID(),
+                    TeamColor.valueOf(joinGameRequest.playerColor()));
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 
-    // public void enterPetShop(String visitorName) throws ResponseException {
-    //     try {
-    //         var action = new Action(Action.Type.ENTER, visitorName);
-    //         this.session.getBasicRemote().sendText(new Gson().toJson(action));
-    //     } catch (IOException ex) {
-    //         throw new ResponseException(500, ex.getMessage());
-    //     }
-    // }
-
-    // public void leavePetShop(String visitorName) throws ResponseException {
-    //     try {
-    //         var action = new Action(Action.Type.EXIT, visitorName);
-    //         this.session.getBasicRemote().sendText(new Gson().toJson(action));
-    //         this.session.close();
-    //     } catch (IOException ex) {
-    //         throw new ResponseException(500, ex.getMessage());
-    //     }
-    // }
+    public void leaveGame(String authToken, int gameID) throws ResponseException {
+        try {
+            var action = new LeaveGameCommand(authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            this.session.close(); // TODO: should I close this?
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 }

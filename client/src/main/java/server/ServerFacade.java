@@ -56,7 +56,11 @@ public class ServerFacade {
 
     public void joinGame(JoinGameRequest joinGameRequest) throws ResponseException {
         var path = "/game";
+        // Join the game on the server
         this.http.makeRequest("PUT", authToken, path, joinGameRequest, null);
+
+        // join the game on the websocket
+        this.ws.joinGame(authToken, joinGameRequest);
     }
 
     public void clearApplication() throws ResponseException {

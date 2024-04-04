@@ -18,6 +18,7 @@ public class ChessClient implements ServerMessageObserver {
     private State state = State.SIGNEDOUT;
     private ServerFacade server;
     private GameList gameList;
+    private ChessGame game;
 
     public ChessClient(String serverUrl) throws ResponseException {
         this.server = new ServerFacade(serverUrl, this);
@@ -53,8 +54,7 @@ public class ChessClient implements ServerMessageObserver {
 
     public String evalGameplay(String cmd, String[] params) {
         return switch (cmd) {
-            // TODO: implement these commands
-            case "redraw" -> showDefaultGame();
+            case "redraw" -> redraw();
             case "leave" -> "leave";
             case "move" -> "move";
             case "resign" -> "resign";
@@ -145,6 +145,10 @@ public class ChessClient implements ServerMessageObserver {
         } catch (ResponseException e) {
             return e.getMessage();
         }
+    }
+
+    public String redraw() {
+        return ChessGameRenderer.renderGame(this.game);
     }
 
     public String help() {
