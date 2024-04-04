@@ -6,7 +6,7 @@ import exceptions.ResponseException;
 import model.GameData;
 
 public interface GameDAO {
-    public GameData getGame(int gameId) throws ResponseException;
+    public GameData getGame(int gameID) throws ResponseException;
 
     public Collection<GameData> listGames(String username) throws ResponseException;
 
@@ -14,7 +14,7 @@ public interface GameDAO {
 
     public GameData updateGame(GameData game) throws DataAccessException, ResponseException;
 
-    public void deleteGame(int gameId) throws ResponseException, DataAccessException;
+    public void deleteGame(int gameID) throws ResponseException, DataAccessException;
 
     public void deleteAllGames() throws ResponseException, DataAccessException;
 

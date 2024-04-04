@@ -43,11 +43,11 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
         configureDatabase(createStatements);
     }
 
-    public GameData getGame(int gameId) throws ResponseException {
+    public GameData getGame(int gameID) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = String.format("SELECT * FROM %s WHERE game_id=?", GAMES_TABLE);
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setInt(1, gameId);
+                ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readGame(rs);
@@ -120,9 +120,9 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
                 game.game());
     }
 
-    public void deleteGame(int gameId) throws ResponseException, DataAccessException {
+    public void deleteGame(int gameID) throws ResponseException, DataAccessException {
         var statement = String.format("DELETE FROM %s WHERE game_id=?", GAMES_TABLE);
-        executeUpdate(statement, gameId);
+        executeUpdate(statement, gameID);
     }
 
     public void deleteAllGames() throws ResponseException, DataAccessException {
@@ -148,14 +148,14 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
     }
 
     private GameData readGame(ResultSet rs) throws SQLException {
-        var gameId = rs.getInt("game_id");
+        var gameID = rs.getInt("game_id");
         var gameName = rs.getString("game_name");
         var whiteUsername = rs.getString("white_username");
         var blackUsername = rs.getString("black_username");
         var gameState = rs.getString("game_state");
         var chessGameState = new Gson().fromJson(gameState, ChessGame.class);
         return new GameData(
-                gameId,
+                gameID,
                 whiteUsername,
                 blackUsername,
                 gameName,

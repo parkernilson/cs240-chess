@@ -48,9 +48,9 @@ public class CreateGameHandler {
                 return new Gson().toJson(Map.of("message", "Error: unauthorized"));
             }
 
-            final int gameId = gameService.getNextGameId();
+            final int gameID = gameService.getNextGameId();
             final var gameData = gameService.createGame(new GameData(
-                    gameId,
+                    gameID,
                     null,
                     null,
                     gameName,

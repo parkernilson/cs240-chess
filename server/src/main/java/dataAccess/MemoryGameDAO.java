@@ -8,8 +8,8 @@ import model.GameData;
 public class MemoryGameDAO implements GameDAO {
     private HashMap<Integer, GameData> games = new HashMap<Integer, GameData>();
 
-    public GameData getGame(int gameId) {
-        return games.get(gameId);
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
     }
 
     public Collection<GameData> listGames(String username) {
@@ -30,8 +30,8 @@ public class MemoryGameDAO implements GameDAO {
         return game;
     }
 
-    public void deleteGame(int gameId) {
-        games.remove(gameId);
+    public void deleteGame(int gameID) {
+        games.remove(gameID);
     }
 
     public void deleteAllGames() {

@@ -29,19 +29,19 @@ public class GameService {
         return gameDAO.createGame(gameData);
     }
 
-    public GameData getGame(int gameId) throws ResponseException {
-        return gameDAO.getGame(gameId);
+    public GameData getGame(int gameID) throws ResponseException {
+        return gameDAO.getGame(gameID);
     }
 
     public int getNextGameId() throws ResponseException {
         return gameDAO.getMaxGameId() + 1;
     }
 
-    public void addParticipant(int gameId, String username, ChessGame.TeamColor color) throws DataAccessException, ResponseException {
-        final var game = gameDAO.getGame(gameId);
+    public void addParticipant(int gameID, String username, ChessGame.TeamColor color) throws DataAccessException, ResponseException {
+        final var game = gameDAO.getGame(gameID);
         if (game == null) throw new DataAccessException("Game not found");
         final var newGame = new GameData(
-            gameId, 
+            gameID, 
             color == ChessGame.TeamColor.WHITE ? username : game.whiteUsername(),
             color == ChessGame.TeamColor.BLACK ? username : game.blackUsername(), 
             game.gameName(), 

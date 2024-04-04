@@ -22,7 +22,7 @@ public class JoinGameHandler {
 
     public Object handle(Request req, Response res) {
         String playerColorString;
-        int gameId;
+        int gameID;
 
         try {
             final var requestBody = new Gson().fromJson(req.body(), JoinGameRequest.class);
@@ -30,8 +30,8 @@ public class JoinGameHandler {
             if (playerColorString != null) {
                 playerColorString = playerColorString.toUpperCase();
             }
-            gameId = requestBody.gameID();
-            if (gameId < 0) {
+            gameID = requestBody.gameID();
+            if (gameID < 0) {
                 throw new Exception();
             }
         } catch (Exception e) {
@@ -53,7 +53,7 @@ public class JoinGameHandler {
 
             final var playerColor = playerColorString == null ? null : ChessGame.TeamColor.valueOf(playerColorString);
 
-            final var game = gameService.getGame(gameId);
+            final var game = gameService.getGame(gameID);
             if (game == null) {
                 res.status(400);
                 return new Gson().toJson(Map.of("message", "Error: bad request"));
@@ -66,7 +66,7 @@ public class JoinGameHandler {
                     res.status(403);
                     return new Gson().toJson(Map.of("message", "Error: already taken"));
                 }
-                gameService.addParticipant(gameId, user.username(), playerColor);
+                gameService.addParticipant(gameID, user.username(), playerColor);
             }
 
             res.status(200);
