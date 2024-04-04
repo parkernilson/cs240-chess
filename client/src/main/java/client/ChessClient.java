@@ -28,19 +28,49 @@ public class ChessClient implements ServerMessageObserver {
         return state;
     }
 
-    public String eval(String input) {
-        var tokens = input.toLowerCase().split(" ");
-        var cmd = (tokens.length > 0) ? tokens[0] : "help";
-        var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+    public String evalSignedIn(String cmd, String[] params) {
         return switch (cmd) {
-            case "login" -> login(new LoginRequest(params[0], params[1]));
-            case "register" -> register(new RegisterRequest(params[0], params[1], params[2]));
-            case "logout" -> logout();
             case "create" -> createGame(new CreateGameRequest(params[0]));
             case "list" -> listGames();
             case "join" -> joinGame(Integer.parseInt(params[0]), params.length > 1 ? params[1] : null);
             case "observe" -> joinGame(Integer.parseInt(params[0]), null);
+            case "logout" -> logout();
             case "quit" -> "quit";
+            case "help" -> help();
+            default -> help();
+        };
+    }
+
+    public String evalSignedOut(String cmd, String[] params) {
+        return switch (cmd) {
+            case "register" -> register(new RegisterRequest(params[0], params[1], params[2]));
+            case "login" -> login(new LoginRequest(params[0], params[1]));
+            case "quit" -> "quit";
+            case "help" -> help();
+            default -> help();
+        };
+    }
+
+    public String evalGameplay(String cmd, String[] params) {
+        return switch (cmd) {
+            // TODO: implement these commands
+            case "redraw" -> showDefaultGame();
+            case "leave" -> "leave";
+            case "move" -> "move";
+            case "resign" -> "resign";
+            case "show-moves" -> "show-moves";
+            case "help" -> help();
+            default -> help();
+        };
+    }
+    public String eval(String input) {
+        var tokens = input.toLowerCase().split(" ");
+        var cmd = (tokens.length > 0) ? tokens[0] : "help";
+        var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+        return switch (state) {
+            case State.SIGNEDIN -> evalSignedIn(cmd, params);
+            case State.SIGNEDOUT -> evalSignedOut(cmd, params);
+            case State.GAMEPLAY -> evalGameplay(cmd, params);
             default -> help();
         };
     }
