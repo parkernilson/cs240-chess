@@ -4,12 +4,14 @@ import java.util.Arrays;
 
 import chess.ChessGame;
 import exceptions.ResponseException;
+import model.GameData;
 import server.ServerFacade;
 import server.model.CreateGameRequest;
 import server.model.JoinGameRequest;
 import server.model.LoginRequest;
 import server.model.RegisterRequest;
 import webSocketMessages.ServerMessageObserver;
+import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
 import ui.Color;
@@ -18,7 +20,7 @@ public class ChessClient implements ServerMessageObserver {
     private State state = State.SIGNEDOUT;
     private ServerFacade server;
     private GameList gameList;
-    private ChessGame game;
+    private GameData gameData;
 
     public ChessClient(String serverUrl) throws ResponseException {
         this.server = new ServerFacade(serverUrl, this);
@@ -74,12 +76,6 @@ public class ChessClient implements ServerMessageObserver {
             case State.GAMEPLAY -> evalGameplay(cmd, params);
             default -> help();
         };
-    }
-
-    public String showDefaultGame() {
-        ChessGame game = new ChessGame();
-        game.getBoard().resetBoard();
-        return ChessGameRenderer.renderGame(game);
     }
 
     public String login(LoginRequest loginRequest) {
@@ -142,14 +138,14 @@ public class ChessClient implements ServerMessageObserver {
             assertSignedIn();
             var game = this.gameList.get(gameNumber);
             this.server.joinGame(new JoinGameRequest(color, game.gameID()));
-            return showDefaultGame();
+            return "TODO: implement me";
         } catch (ResponseException e) {
             return e.getMessage();
         }
     }
 
     public String redraw() {
-        return ChessGameRenderer.renderGame(this.game);
+        return ChessGameRenderer.renderGame(this.gameData.game());
     }
 
     public String leaveGame(int gameID) {
@@ -195,6 +191,10 @@ public class ChessClient implements ServerMessageObserver {
         if (message instanceof NotificationMessage) {
             var notificationMessage = (NotificationMessage) message;
             System.out.println(notificationMessage.getMessage());
+        } else if (message instanceof LoadGameMessage) {
+            var loadGameMessage = (LoadGameMessage) message;
+            this.gameData = loadGameMessage.getGameData();
+            System.out.println(ChessGameRenderer.renderGame(this.gameData.game()));
         }
     }
 
