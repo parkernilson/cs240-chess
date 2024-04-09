@@ -4,6 +4,7 @@ import webSocketMessages.ServerMessageObserver;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinGameCommand;
 import webSocketMessages.userCommands.LeaveGameCommand;
+import webSocketMessages.userCommands.MakeMoveCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 
 import java.io.IOException;
@@ -12,9 +13,12 @@ import java.net.URISyntaxException;
 
 import javax.websocket.*;
 
+import org.glassfish.grizzly.http.server.Response;
+
 import com.google.gson.Gson;
 
 import chess.ChessGame.TeamColor;
+import chess.ChessMove;
 import exceptions.ResponseException;
 import server.model.JoinGameRequest;
 
@@ -63,6 +67,15 @@ public class WebSocketCommunicator {
             this.session.close(); // TODO: should I close this?
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    public void makeMove(String authToken, ChessMove move) throws ResponseException {
+        try {
+            var action = new MakeMoveCommand(authToken, move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException e) {
+            throw new ResponseException(500, authToken);
         }
     }
 }

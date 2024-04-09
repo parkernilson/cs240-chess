@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessMove;
 import exceptions.ResponseException;
 import server.model.CreateGameRequest;
 import server.model.CreateGameResponse;
@@ -71,6 +72,10 @@ public class ServerFacade {
     public void clearApplication() throws ResponseException {
         var path = "/db";
         this.http.makeRequest("DELETE", authToken, path, null, null);
+    }
+
+    public void makeMove(ChessMove move) throws ResponseException {
+        this.ws.makeMove(authToken, move);
     }
  
 }

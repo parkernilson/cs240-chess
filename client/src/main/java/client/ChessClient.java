@@ -5,7 +5,9 @@ import java.util.stream.Collectors;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
+import chess.ChessPiece.PieceType;
 import exceptions.ResponseException;
 import model.GameData;
 import server.ServerFacade;
@@ -61,8 +63,9 @@ public class ChessClient implements ServerMessageObserver {
         return switch (cmd) {
             case "redraw" -> redraw();
             case "leave" -> leaveGame(this.gameData.gameID());
-            case "move" -> "move";
-            case "resign" -> "resign";
+            case "move" -> makeMove(params[0], params[1], params[2]);
+            // TODO: is resign the same as leave game?
+            case "resign" -> leaveGame(this.gameData.gameID());
             case "show-moves" -> showMoves(params[0]);
             case "help" -> help();
             default -> help();
@@ -158,6 +161,23 @@ public class ChessClient implements ServerMessageObserver {
             return e.getMessage();
         }
         return "Leaving game...";
+    }
+
+    public String makeMove(String fromPosition, String toPosition, String promotionPiece) {
+        ChessPosition from = ChessPosition.parse(fromPosition);
+        ChessPosition to = ChessPosition.parse(toPosition);
+        PieceType promotionPieceType = promotionPiece == null ? null : PieceType.valueOf(promotionPiece);
+
+        ChessMove move = new ChessMove(from, to, promotionPieceType);
+
+        try {
+            // TODO: get response?
+            this.server.makeMove(move);
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
+        // TODO: add better message here
+        return "Moving...";
     }
 
     public String showMoves(String fromPosition) {
