@@ -3,11 +3,9 @@ package client;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import chess.ChessGame;
 import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import chess.ChessPiece.PieceType;
+import chess.ChessPosition;
 import exceptions.ResponseException;
 import model.GameData;
 import server.ServerFacade;
@@ -15,11 +13,11 @@ import server.model.CreateGameRequest;
 import server.model.JoinGameRequest;
 import server.model.LoginRequest;
 import server.model.RegisterRequest;
+import ui.Color;
 import webSocketMessages.ServerMessageObserver;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
-import ui.Color;
 
 public class ChessClient implements ServerMessageObserver {
     private State state = State.SIGNEDOUT;
