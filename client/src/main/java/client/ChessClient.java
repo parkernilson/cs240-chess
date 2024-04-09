@@ -57,8 +57,7 @@ public class ChessClient implements ServerMessageObserver {
     public String evalGameplay(String cmd, String[] params) {
         return switch (cmd) {
             case "redraw" -> redraw();
-            // TODO: get the game ID from the current game
-            case "leave" -> "leave";
+            case "leave" -> leaveGame(this.gameData.gameID());
             case "move" -> "move";
             case "resign" -> "resign";
             case "show-moves" -> "show-moves";
