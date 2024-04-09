@@ -19,6 +19,13 @@ public class ServerFacade {
     private WebSocketCommunicator ws;
     private HttpCommunicator http;
 
+    public ServerFacade(String url) throws ResponseException {
+        serverUrl = url;
+        this.authToken = null;
+        this.http = new HttpCommunicator(serverUrl);
+        this.ws = new WebSocketCommunicator(serverUrl, null);
+    }
+
     public ServerFacade(String url, ServerMessageObserver observer) throws ResponseException {
         serverUrl = url;
         this.authToken = null;
