@@ -17,6 +17,18 @@ public class ChessPosition {
     }
 
     /**
+     * @return a chess position from a string formatted: [a-h][1-8]
+     */
+    public static ChessPosition parse(String chessPositionString) {
+        if (chessPositionString.length() != 2) {
+            throw new IllegalArgumentException("Invalid position string");
+        }
+        int col = chessPositionString.charAt(0) - 'a' + 1;
+        int row = chessPositionString.charAt(1) - '0';
+        return new ChessPosition(row, col);
+    }
+
+    /**
      * @return which row this position is in
      * 1 codes for the bottom row
      */

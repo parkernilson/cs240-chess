@@ -1,8 +1,11 @@
 package client;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import exceptions.ResponseException;
 import model.GameData;
 import server.ServerFacade;
@@ -60,11 +63,12 @@ public class ChessClient implements ServerMessageObserver {
             case "leave" -> leaveGame(this.gameData.gameID());
             case "move" -> "move";
             case "resign" -> "resign";
-            case "show-moves" -> "show-moves";
+            case "show-moves" -> showMoves(params[0]);
             case "help" -> help();
             default -> help();
         };
     }
+
     public String eval(String input) {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
@@ -154,6 +158,18 @@ public class ChessClient implements ServerMessageObserver {
             return e.getMessage();
         }
         return "Leaving game...";
+    }
+
+    public String showMoves(String fromPosition) {
+        ChessPosition from = ChessPosition.parse(fromPosition);
+
+        var validPositions = this.gameData.game()
+                .validMoves(from)
+                .stream()
+                .map(ChessMove::getEndPosition)
+                .collect(Collectors.toSet());
+
+        return ChessGameRenderer.renderGame(this.gameData.game(), validPositions);
     }
 
     public String help() {
