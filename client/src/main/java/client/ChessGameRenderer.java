@@ -2,18 +2,32 @@ package client;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import chess.PositionOutOfBoundsException;
+import chess.ChessGame.TeamColor;
 
 import static ui.EscapeSequences.*;
 
+import java.util.Collection;
+import java.util.Set;
+
 public class ChessGameRenderer {
     public static String renderGame(ChessGame game) { 
+        return renderGame(game, null);
+    }
+
+    public static String renderGame(ChessGame game, Collection<ChessPosition> highlightMoves) {
         final var board = game.getBoard();
-        return renderBoard(board, ChessGame.TeamColor.WHITE)
-        + "\n" + renderBoard(board, ChessGame.TeamColor.BLACK);
+        return renderBoard(board, ChessGame.TeamColor.WHITE, highlightMoves)
+        + "\n" + renderBoard(board, ChessGame.TeamColor.BLACK, highlightMoves);
     }
 
     public static String renderBoard(ChessBoard board, ChessGame.TeamColor perspective) {
+        return renderBoard(board, perspective, null);
+    }
+
+    public static String renderBoard(ChessBoard board, ChessGame.TeamColor perspective, Collection<ChessPosition> highlightMoves) {
         String[][] pieces = new String[10][10];
         pieces[0][0] = EMPTY;
         pieces[9][9] = EMPTY;
@@ -22,8 +36,8 @@ public class ChessGameRenderer {
         for (int i = 1; i < 9; i++) {
             pieces[0][i] = " " + (char) ('a' + i - 1) + " ";
             pieces[9][i] = " " + (char) ('a' + i - 1) + " ";
-            pieces[i][0] = " " + (char) ('8' - i + 1) + " ";
-            pieces[i][9] = " " + (char) ('8' - i + 1) + " ";
+            pieces[9-i][0] = " " + (char) ('8' - i + 1) + " ";
+            pieces[9-i][9] = " " + (char) ('8' - i + 1) + " ";
         }
 
         // fill the board with pieces
@@ -46,12 +60,20 @@ public class ChessGameRenderer {
 
         StringBuilder sb = new StringBuilder();
 
-        final int startI = perspective == ChessGame.TeamColor.WHITE ? 0 : 9;
+        final int startI = perspective == ChessGame.TeamColor.WHITE ? 9 : 0;
         final int startJ = perspective == ChessGame.TeamColor.WHITE ? 0 : 9;
-        final int delta = perspective == ChessGame.TeamColor.WHITE ? 1 : -1;
-        for (int i = startI; i >= 0 && i < 10; i += delta) {
-            for (int j = startJ; j >= 0 && j < 10; j += delta) {
-                var bg = (i + j) % 2 == 0 ? BG_WHITE : BG_LIGHT_GREY;
+        final int deltaI = perspective == ChessGame.TeamColor.WHITE ? -1 : 1;
+        final int deltaJ = perspective == ChessGame.TeamColor.WHITE ? 1 : -1;
+        for (int i = startI; i >= 0 && i < 10; i += deltaI) {
+            for (int j = startJ; j >= 0 && j < 10; j += deltaJ) {
+                TeamColor spaceColor = (i + j + 1) % 2 == 0 ? TeamColor.WHITE : TeamColor.BLACK;
+                var bg = spaceColor == TeamColor.WHITE ? BG_WHITE : BG_LIGHT_GREY;
+                try {
+                    var position = board.getNewPosition(i, j);
+                    if (highlightMoves != null && highlightMoves.contains(position)) {
+                        bg = spaceColor == TeamColor.WHITE ? BG_YELLOW : BG_GREEN;
+                    }
+                } catch(PositionOutOfBoundsException e) {}
                 if (i == 0 || i == 9 || j == 0 || j == 9) {
                     bg = "";
                 }
