@@ -4,7 +4,6 @@ import static ui.EscapeSequences.BG_DARK_GREEN;
 import static ui.EscapeSequences.BG_GREEN;
 import static ui.EscapeSequences.BG_LIGHT_GREY;
 import static ui.EscapeSequences.BG_WHITE;
-import static ui.EscapeSequences.BG_YELLOW;
 import static ui.EscapeSequences.BLUE;
 import static ui.EscapeSequences.EMPTY;
 import static ui.EscapeSequences.RESET_ALL;

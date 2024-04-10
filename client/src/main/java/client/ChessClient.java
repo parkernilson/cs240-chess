@@ -147,7 +147,7 @@ public class ChessClient implements ServerMessageObserver {
             assertSignedIn();
             var game = this.gameList.get(gameNumber);
             this.server.joinGame(new JoinGameRequest(color, game.gameID()));
-            return String.format("Join game %s...", game.gameName());
+            return String.format("Joining game: %s...", game.gameName());
         } catch (ResponseException e) {
             return e.getMessage();
         }
@@ -175,13 +175,12 @@ public class ChessClient implements ServerMessageObserver {
         ChessMove move = new ChessMove(from, to, promotionPieceType);
 
         try {
-            // TODO: get response?
             this.server.makeMove(move);
         } catch (ResponseException e) {
             return e.getMessage();
         }
-        // TODO: add better message here
-        return "Moving...";
+
+        return String.format("Making move %s...", move);
     }
 
     public String showMoves(String fromPosition) {

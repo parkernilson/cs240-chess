@@ -143,9 +143,11 @@ public class WebSocketHandler {
     private void leave(LeaveGameCommand action, Session session) throws IOException {
         final var authToken = action.getAuthString();
 
-        UserData user;
         try {
-            user = userService.getUser(authToken);
+            UserData user = userService.getUser(authToken);
+            if (user == null) {
+                throw new ResponseException(401, "Invalid auth token");
+            }
         } catch (ResponseException e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid auth token")));
             return;
