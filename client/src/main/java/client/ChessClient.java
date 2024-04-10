@@ -223,7 +223,7 @@ public class ChessClient implements ServerMessageObserver {
                     {LIGHT_GREY} - {BLUE} move <FROM> <TO> {LIGHT_GREY} - a piece
                     {LIGHT_GREY} - {BLUE} resign
                     {LIGHT_GREY} - {BLUE} show-moves <FROM> {LIGHT_GREY} - a piece
-                    {LIGHT_GRAY} - {BLUE} help
+                    {LIGHT_GREY} - {BLUE} help
                     """);
         } else {
             return Color.format("""
