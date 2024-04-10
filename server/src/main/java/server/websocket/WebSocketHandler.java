@@ -62,7 +62,7 @@ public class WebSocketHandler {
     private void joinPlayer(JoinGameCommand action, Session session) throws IOException {
         final var authToken = action.getAuthString();
         final var gameID = action.getGameID();
-        final var teamColor = action.getTeamColor();
+        final var teamColor = action.getPlayerColor();
 
         UserData user;
         try {
@@ -78,6 +78,9 @@ public class WebSocketHandler {
         GameData game;
         try {
             game = gameService.getGame(gameID);
+            if (game == null) {
+                throw new ResponseException(404, "Game not found");
+            }
         } catch (ResponseException e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid game ID")));
             return;
@@ -86,15 +89,17 @@ public class WebSocketHandler {
         if (teamColor != null) {
             final var requestedColorUsername = teamColor == TeamColor.WHITE ? game.whiteUsername()
                     : game.blackUsername();
-            if (!requestedColorUsername.equals(user.username())) {
+            if (!StringUtils.equals(requestedColorUsername, user.username())) {
                 session.getRemote().sendString(new Gson().toJson(
                         new ErrorMessage("The color was either taken or the user has not joined the game yet.")));
                 return;
             }
-            sessionManager.broadcast(gameID, new NotificationMessage(String.format("%s joined the game as %s", user.username(), teamColor)),
+            sessionManager.broadcast(gameID,
+                    new NotificationMessage(String.format("%s joined the game as %s", user.username(), teamColor)),
                     List.of(authToken));
         } else {
-            sessionManager.broadcast(gameID, new NotificationMessage(String.format("%s joined the game as an observer", user.username())));
+            sessionManager.broadcast(gameID,
+                    new NotificationMessage(String.format("%s joined the game as an observer", user.username())));
         }
 
         sessionManager.addUserToGame(authToken, gameID, session);
@@ -105,7 +110,9 @@ public class WebSocketHandler {
     }
 
     private String checkWinConditions(ChessGame game) {
-        if (game.isInCheckmate(TeamColor.WHITE)) {
+        if (game.getResigned() != null) {
+            return game.getResigned() == TeamColor.WHITE ? "White resigned" : "Black resigned";
+        } else if (game.isInCheckmate(TeamColor.WHITE)) {
             return "Black wins!";
         } else if (game.isInCheckmate(TeamColor.BLACK)) {
             return "White wins!";
@@ -150,14 +157,15 @@ public class WebSocketHandler {
         // if the game is already over, send the message and don't allow any more moves
         String endGameMessage = checkWinConditions(gameData.game());
         if (endGameMessage != null) {
-            sessionManager.broadcast(gameID, new NotificationMessage(endGameMessage));
+            session.getRemote()
+                    .sendString(new Gson().toJson(new ErrorMessage(String.format("Game is over: %s", endGameMessage))));
             return;
         }
 
         // Make sure the user is on the correct team
         final var currentColorUsername = currentTeam == TeamColor.WHITE ? gameData.whiteUsername()
                 : gameData.blackUsername();
-        if (!currentColorUsername.equals(user.username())) {
+        if (!StringUtils.equals(currentColorUsername, user.username())) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("It is not your turn")));
             return;
         }
@@ -202,10 +210,6 @@ public class WebSocketHandler {
     }
 
     private void leave(LeaveGameCommand action, Session session) throws IOException {
-        leave(action, session, false);
-    }
-
-    private void leave(LeaveGameCommand action, Session session, boolean resigned) throws IOException {
         final var authToken = action.getAuthString();
 
         try {
@@ -213,33 +217,78 @@ public class WebSocketHandler {
             if (user == null) {
                 throw new ResponseException(401, "Invalid auth token");
             }
-            
+
             GameData game = gameService.getGame(action.getGameID());
             GameData newGame = new GameData(
-                game.gameID(),
-                StringUtils.equals(game.whiteUsername(), user.username()) ? null : game.whiteUsername(),
-                StringUtils.equals(game.blackUsername(), user.username()) ? null : game.blackUsername(),
-                game.gameName(),
-                game.game()
-            );
+                    game.gameID(),
+                    StringUtils.equals(game.whiteUsername(), user.username()) ? null : game.whiteUsername(),
+                    StringUtils.equals(game.blackUsername(), user.username()) ? null : game.blackUsername(),
+                    game.gameName(),
+                    game.game());
             gameService.updateGame(newGame);
 
             sessionManager.broadcast(action.getGameID(),
                     new NotificationMessage(
-                            String.format("%s %s the game", user.username(), resigned ? "resigned" : "left")),
-                    List.of(authToken));
+                            String.format("%s left the game", user.username())));
             sessionManager.removeUserFromGame(authToken);
         } catch (ResponseException e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid auth token")));
+            e.printStackTrace();
             return;
         } catch (DataAccessException e) {
-            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Something went wrong when updating the game")));
+            session.getRemote()
+                    .sendString(new Gson().toJson(new ErrorMessage("Something went wrong when updating the game")));
             e.printStackTrace();
             return;
         }
     }
 
     private void resign(ResignGameCommand action, Session session) throws IOException {
-        leave(new LeaveGameCommand(action.getAuthString(), action.getGameID()), session, true);
+        final var authToken = action.getAuthString();
+
+        try {
+            UserData user = userService.getByAuthToken(authToken);
+            if (user == null) {
+                throw new ResponseException(401, "Invalid auth token");
+            }
+
+            GameData gameData = gameService.getGame(action.getGameID());
+            TeamColor color = StringUtils.equals(gameData.whiteUsername(), user.username()) ? TeamColor.WHITE
+                    : null;
+            color = StringUtils.equals(gameData.blackUsername(), user.username()) ? TeamColor.BLACK : color;
+
+            if (color == null) {
+                throw new ResponseException(400, "User is not in the game");
+            }
+
+            final var endGameMessage = checkWinConditions(gameData.game());
+            if (endGameMessage != null) {
+                session.getRemote()
+                        .sendString(new Gson().toJson(new ErrorMessage(String.format("Game is over: %s", endGameMessage))));
+                return;
+            }
+
+            gameData.game().setResigned(color);
+            GameData newGame = new GameData(
+                    gameData.gameID(),
+                    gameData.whiteUsername(),
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    gameData.game());
+            gameService.updateGame(newGame);
+
+            sessionManager.broadcast(action.getGameID(),
+                    new NotificationMessage(
+                            String.format("%s resigned the game", user.username())));
+        } catch (ResponseException e) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage(e.getMessage())));
+            e.printStackTrace();
+            return;
+        } catch (DataAccessException e) {
+            session.getRemote()
+                    .sendString(new Gson().toJson(new ErrorMessage("Something went wrong when updating the game")));
+            e.printStackTrace();
+            return;
+        }
     }
 }

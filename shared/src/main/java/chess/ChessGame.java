@@ -18,6 +18,8 @@ public class ChessGame {
 
     private TeamColor turnTeam = TeamColor.WHITE;
     private ChessBoard board;
+    private TeamColor winner = null;
+    private TeamColor resigner = null;
 
     public ChessGame() {
         board = new ChessBoard();
@@ -37,6 +39,15 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         turnTeam = team;
+    }
+
+    public void setResigned(TeamColor team) {
+        this.resigner = team;
+        this.winner = team == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+    }
+
+    public TeamColor getResigned() {
+        return this.resigner;
     }
 
     /**

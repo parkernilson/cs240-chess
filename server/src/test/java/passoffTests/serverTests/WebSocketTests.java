@@ -49,7 +49,8 @@ public class WebSocketTests {
 
         environment = new WebsocketTestingEnvironment("localhost", port, "/connect");
 
-        waitTime = TestFactory.getMessageTime();
+        // waitTime = TestFactory.getMessageTime();
+        waitTime = 6000L;
     }
 
 
