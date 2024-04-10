@@ -19,6 +19,7 @@ import model.GameData;
 import model.UserData;
 import service.GameService;
 import service.UserService;
+import util.StringUtils;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
@@ -90,11 +91,13 @@ public class WebSocketHandler {
                         new ErrorMessage("The color was either taken or the user has not joined the game yet.")));
                 return;
             }
+            sessionManager.broadcast(gameID, new NotificationMessage(String.format("%s joined the game as %s", user.username(), teamColor)),
+                    List.of(authToken));
+        } else {
+            sessionManager.broadcast(gameID, new NotificationMessage(String.format("%s joined the game as an observer", user.username())));
         }
 
         sessionManager.addUserToGame(authToken, gameID, session);
-        sessionManager.broadcast(gameID, new NotificationMessage(String.format("%s joined the game", user.username())),
-                List.of(authToken));
 
         final var loadGameMessage = new LoadGameMessage(game);
 
@@ -178,14 +181,16 @@ public class WebSocketHandler {
                 sessionManager.broadcast(gameID, new NotificationMessage(endGameMessageAfterMove));
             } else {
                 if (gameData.game().isInCheck(otherTeam)) {
-                    sessionManager.broadcast(gameID, new NotificationMessage(String.format("%s is in check!", otherTeam)));
+                    sessionManager.broadcast(gameID,
+                            new NotificationMessage(String.format("%s is in check!", otherTeam)));
                 }
             }
         } catch (InvalidMoveException e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid move")));
             return;
         } catch (DataAccessException e) {
-            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Something went wrong when updating the game")));
+            session.getRemote()
+                    .sendString(new Gson().toJson(new ErrorMessage("Something went wrong when updating the game")));
             e.printStackTrace();
             return;
         } catch (ResponseException e) {
@@ -197,22 +202,44 @@ public class WebSocketHandler {
     }
 
     private void leave(LeaveGameCommand action, Session session) throws IOException {
+        leave(action, session, false);
+    }
+
+    private void leave(LeaveGameCommand action, Session session, boolean resigned) throws IOException {
         final var authToken = action.getAuthString();
 
         try {
-            UserData user = userService.getUser(authToken);
+            UserData user = userService.getByAuthToken(authToken);
             if (user == null) {
                 throw new ResponseException(401, "Invalid auth token");
             }
+            
+            GameData game = gameService.getGame(action.getGameID());
+            GameData newGame = new GameData(
+                game.gameID(),
+                StringUtils.equals(game.whiteUsername(), user.username()) ? null : game.whiteUsername(),
+                StringUtils.equals(game.blackUsername(), user.username()) ? null : game.blackUsername(),
+                game.gameName(),
+                game.game()
+            );
+            gameService.updateGame(newGame);
+
+            sessionManager.broadcast(action.getGameID(),
+                    new NotificationMessage(
+                            String.format("%s %s the game", user.username(), resigned ? "resigned" : "left")),
+                    List.of(authToken));
+            sessionManager.removeUserFromGame(authToken);
         } catch (ResponseException e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid auth token")));
             return;
+        } catch (DataAccessException e) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Something went wrong when updating the game")));
+            e.printStackTrace();
+            return;
         }
-
-        sessionManager.removeUserFromGame(authToken);
     }
 
     private void resign(ResignGameCommand action, Session session) throws IOException {
-        leave(new LeaveGameCommand(action.getAuthString(), action.getGameID()), session);
+        leave(new LeaveGameCommand(action.getAuthString(), action.getGameID()), session, true);
     }
 }

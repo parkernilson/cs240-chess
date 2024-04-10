@@ -71,9 +71,9 @@ public class ServerFacade {
         this.ws.joinGame(authToken, joinGameRequest);
     }
 
-    public void leaveGame(int gameID) throws ResponseException {
+    public void leaveGame(int gameID, boolean resign) throws ResponseException {
         // Leave the game on the websocket
-        this.ws.leaveGame(authToken, gameID);
+        this.ws.leaveGame(authToken, gameID, resign);
     }
 
     public void clearApplication() throws ResponseException {

@@ -26,6 +26,7 @@ import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinGameCommand;
 import webSocketMessages.userCommands.LeaveGameCommand;
 import webSocketMessages.userCommands.MakeMoveCommand;
+import webSocketMessages.userCommands.ResignGameCommand;
 
 public class WebSocketCommunicator extends Endpoint {
     String url;
@@ -71,19 +72,20 @@ public class WebSocketCommunicator extends Endpoint {
         });
     }
 
-    //Endpoint requires this method, but you don't have to do anything
+    // Endpoint requires this method, but you don't have to do anything
     @Override
-        public void onOpen(Session session, EndpointConfig endpointConfig) {
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ResponseException {
         try {
-            String colorName = joinGameRequest.playerColor() != null ? joinGameRequest.playerColor().toUpperCase() : null;
+            String colorName = joinGameRequest.playerColor() != null ? joinGameRequest.playerColor().toUpperCase()
+                    : null;
             TeamColor color = colorName != null ? TeamColor.valueOf(colorName) : null;
             var action = new JoinGameCommand(authToken, joinGameRequest.gameID(), color);
             connect();
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new ResponseException(400, "Invalid color");
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
@@ -94,9 +96,9 @@ public class WebSocketCommunicator extends Endpoint {
         }
     }
 
-    public void leaveGame(String authToken, int gameID) throws ResponseException {
+    public void leaveGame(String authToken, int gameID, boolean resign) throws ResponseException {
         try {
-            var action = new LeaveGameCommand(authToken, gameID);
+            var action = resign ? new ResignGameCommand(authToken, gameID) : new LeaveGameCommand(authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
             this.session.close();
         } catch (IOException ex) {

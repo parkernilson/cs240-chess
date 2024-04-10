@@ -39,6 +39,10 @@ public class GameSessionManager {
     }
 
     public void broadcast(Integer gameID, Object message, Collection<String> excludedUsers) {
+        if (gameConnections.get(gameID) == null) {
+            return;
+        }
+
         for (Connection connection : gameConnections.get(gameID)) {
             // Clean up any connections that have been closed
             if (!connection.session().isOpen()) {

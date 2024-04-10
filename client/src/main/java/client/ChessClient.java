@@ -63,12 +63,12 @@ public class ChessClient implements ServerMessageObserver {
     public String evalGameplay(String cmd, String[] params) {
         return switch (cmd) {
             case "redraw" -> redraw();
-            case "leave" -> leaveGame(this.gameData.gameID());
+            case "leave" -> leaveGame(this.gameData.gameID(), false);
             case "move" -> {
                 String promotionPieceParam = params.length > 2 ? params[2] : null;
                 yield makeMove(params[0], params[1], promotionPieceParam);
             }
-            case "resign" -> leaveGame(this.gameData.gameID());
+            case "resign" -> leaveGame(this.gameData.gameID(), true);
             case "show-moves" -> showMoves(params[0]);
             case "help" -> help();
             default -> help();
@@ -157,9 +157,9 @@ public class ChessClient implements ServerMessageObserver {
         return ChessGameRenderer.renderGame(this.gameData.game());
     }
 
-    public String leaveGame(int gameID) {
+    public String leaveGame(int gameID, boolean resign) {
         try {
-            this.server.leaveGame(gameID);
+            this.server.leaveGame(gameID, resign);
             state = State.SIGNEDIN;
         } catch (ResponseException e) {
             return e.getMessage();
