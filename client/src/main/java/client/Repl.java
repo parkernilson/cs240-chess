@@ -10,7 +10,7 @@ public class Repl {
     private final ChessClient client;
 
     public Repl(String serverUrl) throws ResponseException {
-        client = new ChessClient(serverUrl);
+        client = new ChessClient(serverUrl, this);
     }
 
     public void run() {
@@ -32,8 +32,12 @@ public class Repl {
         }
     }
 
-    private void printPrompt() {
-        String stateString = client.getState() == State.SIGNEDIN ? GREEN + "LOGGED IN" : BLUE + "LOGGED OUT";
+    public void printPrompt() {
+        String stateString = switch(client.getState()) {
+            case State.SIGNEDIN -> GREEN + "LOGGED IN";
+            case State.SIGNEDOUT -> BLUE + "LOGGED OUT";
+            case State.GAMEPLAY -> GREEN + "GAMEPLAY";
+        };
         System.out.print(
             "\n" 
             + RESET 

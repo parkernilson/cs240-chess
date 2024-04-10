@@ -25,10 +25,12 @@ public class ChessClient implements ServerMessageObserver {
     private ServerFacade server;
     private GameList gameList;
     private GameData gameData;
+    private Repl repl;
 
-    public ChessClient(String serverUrl) throws ResponseException {
+    public ChessClient(String serverUrl, Repl repl) throws ResponseException {
         this.server = new ServerFacade(serverUrl, this);
         this.gameList = null;
+        this.repl = repl;
     }
 
     public State getState() {
@@ -156,6 +158,7 @@ public class ChessClient implements ServerMessageObserver {
     public String leaveGame(int gameID) {
         try {
             this.server.leaveGame(gameID);
+            state = State.SIGNEDIN;
         } catch (ResponseException e) {
             return e.getMessage();
         }
@@ -224,14 +227,18 @@ public class ChessClient implements ServerMessageObserver {
     public void notify(ServerMessage message) {
         if (message instanceof NotificationMessage) {
             var notificationMessage = (NotificationMessage) message;
-            System.out.println(notificationMessage.getMessage());
+            System.out.println("\n" + notificationMessage.getMessage());
         } else if (message instanceof LoadGameMessage) {
             var loadGameMessage = (LoadGameMessage) message;
             this.gameData = loadGameMessage.getGameData();
+
+            state = State.GAMEPLAY;
+
             System.out.println("\n" + ChessGameRenderer.renderGame(this.gameData.game()));
+            repl.printPrompt();
         } else if (message instanceof ErrorMessage) {
             var errorMessage = (ErrorMessage) message;
-            System.out.println("Error: " + errorMessage.getMessage());
+            System.out.println("\nError: " + errorMessage.getMessage());
         }
     }
 
