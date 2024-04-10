@@ -64,8 +64,10 @@ public class ChessClient implements ServerMessageObserver {
         return switch (cmd) {
             case "redraw" -> redraw();
             case "leave" -> leaveGame(this.gameData.gameID());
-            case "move" -> makeMove(params[0], params[1], params[2]);
-            // TODO: is resign the same as leave game?
+            case "move" -> {
+                String promotionPieceParam = params.length > 2 ? params[2] : null;
+                yield makeMove(params[0], params[1], promotionPieceParam);
+            }
             case "resign" -> leaveGame(this.gameData.gameID());
             case "show-moves" -> showMoves(params[0]);
             case "help" -> help();
@@ -235,11 +237,12 @@ public class ChessClient implements ServerMessageObserver {
             state = State.GAMEPLAY;
 
             System.out.println("\n" + ChessGameRenderer.renderGame(this.gameData.game()));
-            repl.printPrompt();
         } else if (message instanceof ErrorMessage) {
             var errorMessage = (ErrorMessage) message;
             System.out.println("\nError: " + errorMessage.getMessage());
         }
+
+        repl.printPrompt();
     }
 
     private void assertSignedIn() throws ResponseException {
