@@ -43,15 +43,12 @@ public class GameSessionManager {
             return;
         }
 
+        var deadConnections = new ArrayList<Connection>();
+
         for (Connection connection : gameConnections.get(gameID)) {
             // Clean up any connections that have been closed
             if (!connection.session().isOpen()) {
-                gameConnections.get(gameID).remove(connection);
-
-                // remove the game from the list if there are no more connections
-                if (gameConnections.get(gameID).isEmpty()) {
-                    gameConnections.remove(gameID);
-                }
+                deadConnections.add(connection);
 
                 continue;
             }
@@ -61,6 +58,10 @@ public class GameSessionManager {
                 final var serializedMessage = new Gson().toJson(message);
                 connection.session().getRemote().sendStringByFuture(serializedMessage);
             }
+        }
+
+        for (Connection connection : deadConnections) {
+            gameConnections.get(gameID).remove(connection);
         }
     }
 
