@@ -22,7 +22,7 @@ public class SQLGameDAO extends SQLDAO implements GameDAO {
                         `white_username` varchar(256) DEFAULT NULL,
                         `black_username` varchar(256) DEFAULT NULL,
                         `game_name` varchar(256) NOT NULL,
-                        `game_state` varchar(256) NOT NULL,
+                        `game_state` TEXT(65000) NOT NULL,
                         PRIMARY KEY (`game_id`),
                         INDEX(game_name)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

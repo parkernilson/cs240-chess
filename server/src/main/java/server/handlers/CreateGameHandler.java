@@ -49,12 +49,14 @@ public class CreateGameHandler {
             }
 
             final int gameID = gameService.getNextGameId();
+            final ChessGame newGame = new ChessGame();
+            newGame.getBoard().resetBoard();
             final var gameData = gameService.createGame(new GameData(
                     gameID,
                     null,
                     null,
                     gameName,
-                    new ChessGame()));
+                    newGame));
 
             res.status(200);
             return new Gson().toJson(Map.of(

@@ -1,19 +1,16 @@
 package server;
 
-import webSocketMessages.ServerMessageObserver;
-import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.JoinGameCommand;
-import webSocketMessages.userCommands.LeaveGameCommand;
-import webSocketMessages.userCommands.MakeMoveCommand;
-import webSocketMessages.userCommands.UserGameCommand;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.websocket.*;
-
-import org.glassfish.grizzly.http.server.Response;
+import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
+import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfig;
+import javax.websocket.MessageHandler;
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
 import com.google.gson.Gson;
 
@@ -21,8 +18,16 @@ import chess.ChessGame.TeamColor;
 import chess.ChessMove;
 import exceptions.ResponseException;
 import server.model.JoinGameRequest;
+import webSocketMessages.ServerMessageObserver;
+import webSocketMessages.serverMessages.ErrorMessage;
+import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.NotificationMessage;
+import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.JoinGameCommand;
+import webSocketMessages.userCommands.LeaveGameCommand;
+import webSocketMessages.userCommands.MakeMoveCommand;
 
-public class WebSocketCommunicator {
+public class WebSocketCommunicator extends Endpoint {
     String url;
     Session session;
     ServerMessageObserver observer;
@@ -41,7 +46,17 @@ public class WebSocketCommunicator {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                    observer.notify(notification);
+                    switch (notification.getServerMessageType()) {
+                        case ERROR -> {
+                            observer.notify(new Gson().fromJson(message, ErrorMessage.class));
+                        }
+                        case LOAD_GAME -> {
+                            observer.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                        }
+                        case NOTIFICATION -> {
+                            observer.notify(new Gson().fromJson(message, NotificationMessage.class));
+                        }
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -49,12 +64,19 @@ public class WebSocketCommunicator {
         }
     }
 
+    //Endpoint requires this method, but you don't have to do anything
+    @Override
+        public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ResponseException {
         // TODO: how to re open the connection after it has been closed?
         try {
-            var action = new JoinGameCommand(authToken, joinGameRequest.gameID(),
-                    TeamColor.valueOf(joinGameRequest.playerColor()));
+            TeamColor color = TeamColor.valueOf(joinGameRequest.playerColor().toUpperCase());
+            var action = new JoinGameCommand(authToken, joinGameRequest.gameID(), color);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch(IllegalArgumentException e) {
+            throw new ResponseException(400, "Invalid color");
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }

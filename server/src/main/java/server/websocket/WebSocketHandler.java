@@ -9,9 +9,8 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import com.google.gson.Gson;
 
-import chess.ChessGame;
-import chess.InvalidMoveException;
 import chess.ChessGame.TeamColor;
+import chess.InvalidMoveException;
 import exceptions.ResponseException;
 import model.GameData;
 import model.UserData;
@@ -20,8 +19,6 @@ import service.UserService;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
-import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.serverMessages.ServerMessage.ServerMessageType;
 import webSocketMessages.userCommands.JoinGameCommand;
 import webSocketMessages.userCommands.LeaveGameCommand;
 import webSocketMessages.userCommands.MakeMoveCommand;
@@ -45,11 +42,11 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
         switch (action.getCommandType()) {
-            case CommandType.JOIN_PLAYER -> joinPlayer((JoinGameCommand) action, session);
-            case CommandType.JOIN_OBSERVER -> joinPlayer((JoinGameCommand) action, session);
-            case CommandType.MAKE_MOVE -> makeMove((MakeMoveCommand) action, session);
-            case CommandType.LEAVE -> leave((LeaveGameCommand) action, session);
-            case CommandType.RESIGN -> resign((ResignGameCommand) action, session);
+            case CommandType.JOIN_PLAYER -> joinPlayer(new Gson().fromJson(message, JoinGameCommand.class), session);
+            case CommandType.JOIN_OBSERVER -> joinPlayer(new Gson().fromJson(message, JoinGameCommand.class), session);
+            case CommandType.MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMoveCommand.class), session);
+            case CommandType.LEAVE -> leave(new Gson().fromJson(message, LeaveGameCommand.class), session);
+            case CommandType.RESIGN -> resign(new Gson().fromJson(message, ResignGameCommand.class), session);
         }
     }
 
@@ -60,7 +57,10 @@ public class WebSocketHandler {
 
         UserData user;
         try {
-            user = userService.getUser(authToken);
+            user = userService.getByAuthToken(authToken);
+            if (user == null) {
+                throw new ResponseException(401, "Invalid auth token");
+            }
         } catch (ResponseException e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid auth token")));
             return;
@@ -77,7 +77,7 @@ public class WebSocketHandler {
         if (teamColor != null) {
             final var requestedColorUsername = teamColor == TeamColor.WHITE ? game.whiteUsername()
                     : game.blackUsername();
-            if (requestedColorUsername != user.username()) {
+            if (!requestedColorUsername.equals(user.username())) {
                 session.getRemote().sendString(new Gson().toJson(
                         new ErrorMessage("The color was either taken or the user has not joined the game yet.")));
                 return;

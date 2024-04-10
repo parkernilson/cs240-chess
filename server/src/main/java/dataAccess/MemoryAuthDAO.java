@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import model.AuthData;
-import util.TokenGenerator;
 
 public class MemoryAuthDAO implements AuthDAO {
     /**

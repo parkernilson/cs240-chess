@@ -15,6 +15,7 @@ import server.model.LoginRequest;
 import server.model.RegisterRequest;
 import ui.Color;
 import webSocketMessages.ServerMessageObserver;
+import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.serverMessages.ServerMessage;
@@ -142,7 +143,7 @@ public class ChessClient implements ServerMessageObserver {
             assertSignedIn();
             var game = this.gameList.get(gameNumber);
             this.server.joinGame(new JoinGameRequest(color, game.gameID()));
-            return "TODO: implement me";
+            return String.format("Join game %s...", game.gameName());
         } catch (ResponseException e) {
             return e.getMessage();
         }
@@ -227,7 +228,10 @@ public class ChessClient implements ServerMessageObserver {
         } else if (message instanceof LoadGameMessage) {
             var loadGameMessage = (LoadGameMessage) message;
             this.gameData = loadGameMessage.getGameData();
-            System.out.println(ChessGameRenderer.renderGame(this.gameData.game()));
+            System.out.println("\n" + ChessGameRenderer.renderGame(this.gameData.game()));
+        } else if (message instanceof ErrorMessage) {
+            var errorMessage = (ErrorMessage) message;
+            System.out.println("Error: " + errorMessage.getMessage());
         }
     }
 

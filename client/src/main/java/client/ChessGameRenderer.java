@@ -1,16 +1,21 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
-import chess.PositionOutOfBoundsException;
-import chess.ChessGame.TeamColor;
-
-import static ui.EscapeSequences.*;
+import static ui.EscapeSequences.BG_GREEN;
+import static ui.EscapeSequences.BG_LIGHT_GREY;
+import static ui.EscapeSequences.BG_WHITE;
+import static ui.EscapeSequences.BG_YELLOW;
+import static ui.EscapeSequences.BLUE;
+import static ui.EscapeSequences.EMPTY;
+import static ui.EscapeSequences.RESET_ALL;
+import static ui.EscapeSequences.WHITE;
 
 import java.util.Collection;
-import java.util.Set;
+
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessGame.TeamColor;
+import chess.ChessPosition;
+import chess.PositionOutOfBoundsException;
 
 public class ChessGameRenderer {
     public static String renderGame(ChessGame game) { 
