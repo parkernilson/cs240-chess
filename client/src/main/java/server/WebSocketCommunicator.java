@@ -29,39 +29,46 @@ import webSocketMessages.userCommands.MakeMoveCommand;
 
 public class WebSocketCommunicator extends Endpoint {
     String url;
+    WebSocketContainer container;
     Session session;
     ServerMessageObserver observer;
 
     public WebSocketCommunicator(String serverUrl, ServerMessageObserver observer) throws ResponseException {
         try {
             this.url = serverUrl.replace("http", "ws");
-            URI socketURI = new URI(url + "/connect");
             this.observer = observer;
 
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, socketURI);
+            connect();
 
-            // set message handler
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                    switch (notification.getServerMessageType()) {
-                        case ERROR -> {
-                            observer.notify(new Gson().fromJson(message, ErrorMessage.class));
-                        }
-                        case LOAD_GAME -> {
-                            observer.notify(new Gson().fromJson(message, LoadGameMessage.class));
-                        }
-                        case NOTIFICATION -> {
-                            observer.notify(new Gson().fromJson(message, NotificationMessage.class));
-                        }
-                    }
-                }
-            });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
+    }
+
+    private void connect() throws URISyntaxException, DeploymentException, IOException {
+        URI socketURI = new URI(this.url + "/connect");
+
+        this.container = ContainerProvider.getWebSocketContainer();
+        this.session = this.container.connectToServer(this, socketURI);
+
+        // set message handler
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            @Override
+            public void onMessage(String message) {
+                ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                switch (notification.getServerMessageType()) {
+                    case ERROR -> {
+                        observer.notify(new Gson().fromJson(message, ErrorMessage.class));
+                    }
+                    case LOAD_GAME -> {
+                        observer.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                    }
+                    case NOTIFICATION -> {
+                        observer.notify(new Gson().fromJson(message, NotificationMessage.class));
+                    }
+                }
+            }
+        });
     }
 
     //Endpoint requires this method, but you don't have to do anything
@@ -70,15 +77,19 @@ public class WebSocketCommunicator extends Endpoint {
     }
 
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ResponseException {
-        // TODO: how to re open the connection after it has been closed?
         try {
             TeamColor color = TeamColor.valueOf(joinGameRequest.playerColor().toUpperCase());
             var action = new JoinGameCommand(authToken, joinGameRequest.gameID(), color);
+            connect();
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch(IllegalArgumentException e) {
             throw new ResponseException(400, "Invalid color");
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (DeploymentException e) {
+            e.printStackTrace();
         }
     }
 
@@ -86,7 +97,7 @@ public class WebSocketCommunicator extends Endpoint {
         try {
             var action = new LeaveGameCommand(authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
-            this.session.close(); // TODO: should I close this?
+            this.session.close();
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }

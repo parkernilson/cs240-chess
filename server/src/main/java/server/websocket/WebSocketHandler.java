@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
@@ -48,6 +49,11 @@ public class WebSocketHandler {
             case CommandType.LEAVE -> leave(new Gson().fromJson(message, LeaveGameCommand.class), session);
             case CommandType.RESIGN -> resign(new Gson().fromJson(message, ResignGameCommand.class), session);
         }
+    }
+
+    @OnWebSocketError
+    public void onError(Session session, Throwable error) {
+        error.printStackTrace();
     }
 
     private void joinPlayer(JoinGameCommand action, Session session) throws IOException {

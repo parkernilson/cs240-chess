@@ -1,5 +1,6 @@
 package server.websocket;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ public class GameSessionManager {
         if (gameConnections.containsKey(gameID)) {
             gameConnections.get(gameID).add(connection);
         } else {
-            gameConnections.put(gameID, List.of(connection));
+            gameConnections.put(gameID, new ArrayList<>(List.of(connection)));
         }
     }
 
