@@ -1,5 +1,6 @@
 package client;
 
+import static ui.EscapeSequences.BG_DARK_GREEN;
 import static ui.EscapeSequences.BG_GREEN;
 import static ui.EscapeSequences.BG_LIGHT_GREY;
 import static ui.EscapeSequences.BG_WHITE;
@@ -76,7 +77,7 @@ public class ChessGameRenderer {
                 try {
                     var position = board.getNewPosition(i, j);
                     if (highlightMoves != null && highlightMoves.contains(position)) {
-                        bg = spaceColor == TeamColor.WHITE ? BG_YELLOW : BG_GREEN;
+                        bg = spaceColor == TeamColor.WHITE ? BG_GREEN : BG_DARK_GREEN;
                     }
                 } catch(PositionOutOfBoundsException e) {}
                 if (i == 0 || i == 9 || j == 0 || j == 9) {
