@@ -248,7 +248,7 @@ public class ChessClient implements ServerMessageObserver {
             System.out.println("\n" + ChessGameRenderer.renderGame(this.gameData.game()));
         } else if (message instanceof ErrorMessage) {
             var errorMessage = (ErrorMessage) message;
-            System.out.println("\nError: " + errorMessage.getMessage());
+            System.out.println("\nError: " + errorMessage.getErrorMessage());
         }
 
         repl.printPrompt();
