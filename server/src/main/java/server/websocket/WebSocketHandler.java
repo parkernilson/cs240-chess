@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
 import chess.InvalidMoveException;
+import dataAccess.DataAccessException;
 import exceptions.ResponseException;
 import model.GameData;
 import model.UserData;
@@ -117,7 +118,10 @@ public class WebSocketHandler {
 
         UserData user;
         try {
-            user = userService.getUser(authToken);
+            user = userService.getByAuthToken(authToken);
+            if (user == null) {
+                throw new ResponseException(401, "Invalid auth token");
+            }
         } catch (ResponseException e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid auth token")));
             return;
@@ -158,26 +162,38 @@ public class WebSocketHandler {
         // try to make the move
         try {
             gameData.game().makeMove(move);
+            gameService.updateGame(gameData);
+
+            // send the updated game state to all players
+            final var loadGameMessage = new LoadGameMessage(gameData);
+            sessionManager.broadcast(gameID, loadGameMessage);
+            // send the move notification to all other players
+            sessionManager.broadcast(gameID,
+                    new NotificationMessage(String.format("%s made move %s", user.username(), move)),
+                    List.of(authToken));
+
+            // check for win conditions after move
+            final var endGameMessageAfterMove = checkWinConditions(gameData.game());
+            if (endGameMessageAfterMove != null) {
+                sessionManager.broadcast(gameID, new NotificationMessage(endGameMessageAfterMove));
+            } else {
+                if (gameData.game().isInCheck(otherTeam)) {
+                    sessionManager.broadcast(gameID, new NotificationMessage(String.format("%s is in check!", otherTeam)));
+                }
+            }
         } catch (InvalidMoveException e) {
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid move")));
             return;
+        } catch (DataAccessException e) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Something went wrong when updating the game")));
+            e.printStackTrace();
+            return;
+        } catch (ResponseException e) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage(e.getMessage())));
+            e.printStackTrace();
+            return;
         }
 
-        // send the updated game state to all players
-        final var loadGameMessage = new LoadGameMessage(gameData);
-        sessionManager.broadcast(gameID, loadGameMessage);
-        // send the move notification to all other players
-        sessionManager.broadcast(gameID,
-                new NotificationMessage(String.format("%s made move %s", user.username(), move)),
-                List.of(authToken));
-
-        // check for win conditions after move
-        final var endGameMessageAfterMove = checkWinConditions(gameData.game());
-        if (endGameMessageAfterMove != null) {
-            sessionManager.broadcast(gameID, new NotificationMessage(endGameMessageAfterMove));
-        } else {
-            gameData.game().setTeamTurn(otherTeam);
-        }
     }
 
     private void leave(LeaveGameCommand action, Session session) throws IOException {

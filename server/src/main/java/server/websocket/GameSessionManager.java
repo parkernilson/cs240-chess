@@ -54,7 +54,8 @@ public class GameSessionManager {
 
             // Send message to all non-excluded connections to the game
             if (!excludedUsers.contains(connection.authToken())) {
-                connection.session().getRemote().sendStringByFuture(new Gson().toJson(message));
+                final var serializedMessage = new Gson().toJson(message);
+                connection.session().getRemote().sendStringByFuture(serializedMessage);
             }
         }
     }

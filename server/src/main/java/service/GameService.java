@@ -33,6 +33,10 @@ public class GameService {
         return gameDAO.getGame(gameID);
     }
 
+    public GameData updateGame(GameData gameData) throws DataAccessException, ResponseException {
+        return gameDAO.updateGame(gameData);
+    }
+
     public int getNextGameId() throws ResponseException {
         return gameDAO.getMaxGameId() + 1;
     }

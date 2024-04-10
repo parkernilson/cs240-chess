@@ -188,6 +188,10 @@ public class ChessClient implements ServerMessageObserver {
 
         var piece = this.gameData.game().getBoard().getPiece(from);
 
+        if (piece == null) {
+            return "There is no piece at that position";
+        }
+
         if (piece.getTeamColor() != this.gameData.game().getTeamTurn()) {
             return "That piece cannot be moved because it is not that team's turn";
         }

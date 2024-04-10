@@ -78,7 +78,8 @@ public class WebSocketCommunicator extends Endpoint {
 
     public void joinGame(String authToken, JoinGameRequest joinGameRequest) throws ResponseException {
         try {
-            TeamColor color = TeamColor.valueOf(joinGameRequest.playerColor().toUpperCase());
+            String colorName = joinGameRequest.playerColor() != null ? joinGameRequest.playerColor().toUpperCase() : null;
+            TeamColor color = colorName != null ? TeamColor.valueOf(colorName) : null;
             var action = new JoinGameCommand(authToken, joinGameRequest.gameID(), color);
             connect();
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
