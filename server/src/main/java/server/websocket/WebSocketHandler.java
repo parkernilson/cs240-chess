@@ -10,6 +10,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import com.google.gson.Gson;
 
+import chess.ChessGame;
 import chess.ChessGame.TeamColor;
 import chess.InvalidMoveException;
 import exceptions.ResponseException;
@@ -99,6 +100,17 @@ public class WebSocketHandler {
         session.getRemote().sendString(new Gson().toJson(loadGameMessage));
     }
 
+    private String checkWinConditions(ChessGame game) {
+        if (game.isInCheckmate(TeamColor.WHITE)) {
+            return "Black wins!";
+        } else if (game.isInCheckmate(TeamColor.BLACK)) {
+            return "White wins!";
+        } else if (game.isInStalemate(TeamColor.WHITE) || game.isInStalemate(TeamColor.BLACK)) {
+            return "Stalemate!";
+        }
+        return null;
+    }
+
     private void makeMove(MakeMoveCommand action, Session session) throws IOException {
         final var authToken = action.getAuthString();
         final var move = action.getMove();
@@ -125,6 +137,25 @@ public class WebSocketHandler {
             return;
         }
 
+        TeamColor currentTeam = gameData.game().getTeamTurn();
+        TeamColor otherTeam = currentTeam == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+
+        // if the game is already over, send the message and don't allow any more moves
+        String endGameMessage = checkWinConditions(gameData.game());
+        if (endGameMessage != null) {
+            sessionManager.broadcast(gameID, new NotificationMessage(endGameMessage));
+            return;
+        }
+
+        // Make sure the user is on the correct team
+        final var currentColorUsername = currentTeam == TeamColor.WHITE ? gameData.whiteUsername()
+                : gameData.blackUsername();
+        if (!currentColorUsername.equals(user.username())) {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("It is not your turn")));
+            return;
+        }
+
+        // try to make the move
         try {
             gameData.game().makeMove(move);
         } catch (InvalidMoveException e) {
@@ -132,12 +163,21 @@ public class WebSocketHandler {
             return;
         }
 
+        // send the updated game state to all players
         final var loadGameMessage = new LoadGameMessage(gameData);
         sessionManager.broadcast(gameID, loadGameMessage);
+        // send the move notification to all other players
         sessionManager.broadcast(gameID,
                 new NotificationMessage(String.format("%s made move %s", user.username(), move)),
                 List.of(authToken));
 
+        // check for win conditions after move
+        final var endGameMessageAfterMove = checkWinConditions(gameData.game());
+        if (endGameMessageAfterMove != null) {
+            sessionManager.broadcast(gameID, new NotificationMessage(endGameMessageAfterMove));
+        } else {
+            gameData.game().setTeamTurn(otherTeam);
+        }
     }
 
     private void leave(LeaveGameCommand action, Session session) throws IOException {

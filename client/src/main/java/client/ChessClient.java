@@ -186,10 +186,16 @@ public class ChessClient implements ServerMessageObserver {
     public String showMoves(String fromPosition) {
         ChessPosition from = ChessPosition.parse(fromPosition);
 
+        var piece = this.gameData.game().getBoard().getPiece(from);
+
+        if (piece.getTeamColor() != this.gameData.game().getTeamTurn()) {
+            return "That piece cannot be moved because it is not that team's turn";
+        }
+
         var validPositions = this.gameData.game()
                 .validMoves(from)
                 .stream()
-                .map(ChessMove::getEndPosition)
+                .map((move) -> move.getEndPosition())
                 .collect(Collectors.toSet());
 
         return ChessGameRenderer.renderGame(this.gameData.game(), validPositions);
